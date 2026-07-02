@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { getMongoUri } = require('./env');
 
 let cached = global.mongoose;
 
@@ -7,13 +8,24 @@ if (!cached) {
 }
 
 const connectDB = async () => {
+  const mongoUri = getMongoUri();
+
+  if (!mongoUri) {
+    throw new Error('MONGO_URI is not configured on the server');
+  }
+
   if (cached.conn) {
     return cached.conn;
   }
 
   if (!cached.promise) {
     cached.promise = mongoose
-      .connect(process.env.MONGO_URI, { bufferCommands: false })
+      .connect(mongoUri, {
+        bufferCommands: false,
+        serverSelectionTimeoutMS: 10000,
+        maxPoolSize: 10,
+        family: 4,
+      })
       .then((mongooseInstance) => {
         console.log(`MongoDB connected: ${mongooseInstance.connection.host}`);
         return mongooseInstance;
