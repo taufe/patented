@@ -200,6 +200,147 @@
  *               success: false
  *               message: Server error during login
  *               error: Internal server error details
+ *
+ * /api/auth/forgot-password:
+ *   post:
+ *     tags:
+ *       - Authentication
+ *     summary: Request password reset code
+ *     description: Sends a 6-digit verification code to the user's email. Returns the same success response whether or not the email exists to prevent account enumeration. Resend requests are rate-limited to once every 60 seconds.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ForgotPasswordRequest'
+ *           example:
+ *             email: john@example.com
+ *     responses:
+ *       200:
+ *         description: Verification code sent (or generic success if email not found)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ForgotPasswordSuccessResponse'
+ *             example:
+ *               success: true
+ *               message: We've sent a verification code to your email.
+ *               email: john@example.com
+ *       400:
+ *         description: Invalid or missing email
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       429:
+ *         description: Resend cooldown active
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Please wait 45 seconds before requesting a new code
+ *       500:
+ *         description: Server error or email delivery failure
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *
+ * /api/auth/verify-reset-code:
+ *   post:
+ *     tags:
+ *       - Authentication
+ *     summary: Verify password reset code
+ *     description: Verifies the 6-digit code sent to the user's email and returns a short-lived reset token for the final password reset step.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/VerifyResetCodeRequest'
+ *           example:
+ *             email: john@example.com
+ *             code: '123456'
+ *     responses:
+ *       200:
+ *         description: Verification code confirmed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/VerifyResetCodeSuccessResponse'
+ *             example:
+ *               success: true
+ *               message: Verification code confirmed
+ *               email: john@example.com
+ *               resetToken: a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456
+ *       400:
+ *         description: Invalid or expired verification code
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Invalid or expired verification code
+ *       500:
+ *         description: Server error during code verification
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *
+ * /api/auth/reset-password:
+ *   post:
+ *     tags:
+ *       - Authentication
+ *     summary: Reset password
+ *     description: Sets a new password using the reset token returned from the verify-reset-code endpoint. Password must be at least 6 characters and match confirmPassword.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ResetPasswordRequest'
+ *           example:
+ *             email: john@example.com
+ *             resetToken: a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456
+ *             password: newSecret123
+ *             confirmPassword: newSecret123
+ *     responses:
+ *       200:
+ *         description: Password reset successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ResetPasswordSuccessResponse'
+ *             example:
+ *               success: true
+ *               message: Password reset successfully. You can now log in with your new password.
+ *       400:
+ *         description: Validation error or invalid/expired reset token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             examples:
+ *               passwordMismatch:
+ *                 summary: Passwords do not match
+ *                 value:
+ *                   success: false
+ *                   message: Passwords do not match
+ *               invalidToken:
+ *                 summary: Invalid or expired reset token
+ *                 value:
+ *                   success: false
+ *                   message: Invalid or expired reset token
+ *       500:
+ *         description: Server error during password reset
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 module.exports = {};

@@ -39,7 +39,7 @@ const swaggerDefinition = {
     },
     {
       name: 'Authentication',
-      description: 'User registration and login',
+      description: 'User registration, login, and password reset',
     },
   ],
 };

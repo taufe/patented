@@ -35,6 +35,23 @@ const getMongoClusterHost = () => {
 
 const getJwtSecret = () => (process.env.JWT_SECRET || '').trim();
 
+const getSmtpHost = () => (process.env.SMTP_HOST || '').trim();
+
+const getSmtpPort = () => {
+  const port = Number(process.env.SMTP_PORT || 587);
+  return Number.isFinite(port) && port > 0 ? port : 587;
+};
+
+const getSmtpUser = () => (process.env.SMTP_USER || '').trim();
+
+const getSmtpPass = () => (process.env.SMTP_PASS || '').trim();
+
+const getSmtpFrom = () =>
+  (process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@patented.app').trim();
+
+const isEmailConfigured = () =>
+  Boolean(getSmtpHost() && getSmtpUser() && getSmtpPass());
+
 const logEnvDiagnostics = () => {
   const mongoUri = getMongoUri();
 
@@ -49,6 +66,12 @@ module.exports = {
   getMongoUri,
   getMongoClusterHost,
   getJwtSecret,
+  getSmtpHost,
+  getSmtpPort,
+  getSmtpUser,
+  getSmtpPass,
+  getSmtpFrom,
+  isEmailConfigured,
   isVercel,
   logEnvDiagnostics,
 };

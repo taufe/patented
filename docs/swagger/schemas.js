@@ -161,6 +161,98 @@
  *           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *         user:
  *           $ref: '#/components/schemas/User'
+ *
+ *     ForgotPasswordRequest:
+ *       type: object
+ *       required:
+ *         - email
+ *       properties:
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: john@example.com
+ *
+ *     ForgotPasswordSuccessResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: We've sent a verification code to your email.
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: john@example.com
+ *
+ *     VerifyResetCodeRequest:
+ *       type: object
+ *       required:
+ *         - email
+ *         - code
+ *       properties:
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: john@example.com
+ *         code:
+ *           type: string
+ *           pattern: '^\\d{6}$'
+ *           example: '123456'
+ *
+ *     VerifyResetCodeSuccessResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: Verification code confirmed
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: john@example.com
+ *         resetToken:
+ *           type: string
+ *           example: a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456
+ *
+ *     ResetPasswordRequest:
+ *       type: object
+ *       required:
+ *         - email
+ *         - resetToken
+ *         - password
+ *         - confirmPassword
+ *       properties:
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: john@example.com
+ *         resetToken:
+ *           type: string
+ *           example: a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456
+ *         password:
+ *           type: string
+ *           format: password
+ *           minLength: 6
+ *           example: newSecret123
+ *         confirmPassword:
+ *           type: string
+ *           format: password
+ *           minLength: 6
+ *           example: newSecret123
+ *
+ *     ResetPasswordSuccessResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: Password reset successfully. You can now log in with your new password.
  */
 
 module.exports = {};
