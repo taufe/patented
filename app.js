@@ -92,24 +92,32 @@ app.use(async (req, res, next) => {
   } catch (error) {
     console.error(`MongoDB connection failed: ${error.message}`);
 
-    const isIpWhitelistError =
-      /whitelist|IP that isn't whitelisted|Could not connect to any servers/i.test(
-        error.message
-      );
+    const isServerSelectionError = /Could not connect to any servers/i.test(
+      error.message
+    );
+    const isVercelDeployment = Boolean(process.env.VERCEL);
 
     res.status(500).json({
       success: false,
-      message: isIpWhitelistError
-        ? 'MongoDB Atlas is blocking this server. Allow 0.0.0.0/0 in Atlas Network Access.'
+      message: isServerSelectionError
+        ? isVercelDeployment
+          ? 'Database connection failed on Vercel (usually DNS/SRV, not IP whitelist if 0.0.0.0/0 is already Active).'
+          : 'Database connection failed. Check Atlas Network Access and MONGO_URI.'
         : 'Database connection failed',
       error: error.message,
-      ...(isIpWhitelistError && {
-        fix: [
-          'Open MongoDB Atlas → Security → Database & Network Access → Network Access',
-          'Click "Add IP Address" → choose "Allow Access from Anywhere" (0.0.0.0/0)',
-          'Wait 1-2 minutes, then retry this request',
-          'Required for Vercel because serverless functions use changing IP addresses',
-        ],
+      ...(isServerSelectionError && {
+        fix: isVercelDeployment
+          ? [
+              'Confirm 0.0.0.0/0 shows Status = Active in Atlas Network Access',
+              'Redeploy on Vercel after pulling the latest backend (uses direct MongoDB hosts on Vercel)',
+              'In Vercel → Settings → Environment Variables, re-save MONGO_URI with no quotes or trailing spaces',
+              'If it still fails, replace MONGO_URI in Vercel with the non-SRV connection string from Atlas → Connect → Drivers',
+            ]
+          : [
+              'Open MongoDB Atlas → Security → Network Access',
+              'Add 0.0.0.0/0 (Allow Access from Anywhere) if deploying to Vercel',
+              'Wait 1-2 minutes, then retry',
+            ],
       }),
     });
   }

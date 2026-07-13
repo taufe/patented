@@ -1,5 +1,11 @@
+const dns = require('dns');
 const mongoose = require('mongoose');
-const { getMongoUri } = require('./env');
+const { getMongoUri, isVercel } = require('./env');
+const { getResolvedMongoUri } = require('./resolveMongoUri');
+
+if (isVercel && typeof dns.setDefaultResultOrder === 'function') {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 let cached = global.mongoose;
 
@@ -19,12 +25,15 @@ const connectDB = async () => {
   }
 
   if (!cached.promise) {
+    const resolvedUri = await getResolvedMongoUri();
+
     cached.promise = mongoose
-      .connect(mongoUri, {
+      .connect(resolvedUri, {
         bufferCommands: false,
-        serverSelectionTimeoutMS: 10000,
-        maxPoolSize: 10,
-        family: 4,
+        serverSelectionTimeoutMS: isVercel ? 30000 : 10000,
+        connectTimeoutMS: isVercel ? 30000 : 10000,
+        maxPoolSize: isVercel ? 5 : 10,
+        ...(isVercel ? {} : { family: 4 }),
       })
       .then((mongooseInstance) => {
         console.log(`MongoDB connected: ${mongooseInstance.connection.host}`);
