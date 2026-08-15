@@ -16,7 +16,38 @@ const toNumber = (value, fallback = 0) => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
+const parseDurationLabel = (label, fallbackSeconds = 0) => {
+  if (Number.isFinite(Number(fallbackSeconds)) && Number(fallbackSeconds) > 0) {
+    return Math.floor(Number(fallbackSeconds));
+  }
+
+  if (!label) {
+    return 0;
+  }
+
+  const parts = String(label)
+    .trim()
+    .replace(/;/g, ':')
+    .split(':')
+    .map((part) => Number(part));
+
+  if (parts.length === 0 || parts.some((part) => !Number.isFinite(part))) {
+    return 0;
+  }
+
+  if (parts.length === 3) {
+    return Math.floor(parts[0] * 3600 + parts[1] * 60 + parts[2]);
+  }
+
+  if (parts.length === 2) {
+    return Math.floor(parts[0] * 60 + parts[1]);
+  }
+
+  return Math.floor(parts[0]);
+};
+
 module.exports = {
   formatDurationLabel,
+  parseDurationLabel,
   toNumber,
 };

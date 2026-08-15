@@ -1,0 +1,331 @@
+{
+  "course": {
+    "title": "Driving License Type B",
+    "description": "Complete Italian driving license Type B theory course with chapter lectures.",
+    "instructor": "Patenta",
+    "thumbnailUrl": "",
+    "status": "Published",
+    "isPremium": false,
+    "quizAvailable": true,
+    "order": 0
+  },
+  "chapters": [
+    {
+      "order": 0,
+      "title": "Chapter 1 - Strade, Classificazione Veicoli, Dovrai Conducente",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Presentation", "durationLabel": "28:23", "durationSeconds": 1703, "videoUrl": "https://vimeo.com/905990781?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "905990781"},
+        {"title": "Page 1 to Page 4", "durationLabel": "33:17", "durationSeconds": 1997, "videoUrl": "https://vimeo.com/885916845?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "885916845"},
+        {"title": "Page 5 to Page 10", "durationLabel": "28:40", "durationSeconds": 1720, "videoUrl": "https://vimeo.com/885946257?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "885946257"},
+        {"title": "Page 11 to Page 13", "durationLabel": "29:34", "durationSeconds": 1774, "videoUrl": "https://vimeo.com/885948402?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "885948402"},
+        {"title": "Page 14 to Page 19", "durationLabel": "34:43", "durationSeconds": 2083, "videoUrl": "https://vimeo.com/915621954?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "915621954"},
+        {"title": "Page 20 to Page 23", "durationLabel": "26:33", "durationSeconds": 1593, "videoUrl": "https://vimeo.com/885956546?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "885956546"},
+        {"title": "Page 24 to Page 28", "durationLabel": "32:18", "durationSeconds": 1938, "videoUrl": "https://vimeo.com/885958537?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "885958537"},
+        {"title": "Page 29 to Page 37", "durationLabel": "33:46", "durationSeconds": 2026, "videoUrl": "https://vimeo.com/885959729?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "885959729"},
+        {"title": "Page 38 to Page 43", "durationLabel": "32:46", "durationSeconds": 1966, "videoUrl": "https://vimeo.com/886845859?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "886845859"},
+        {"title": "Page 44 to Page 50", "durationLabel": "37:25", "durationSeconds": 2245, "videoUrl": "https://vimeo.com/886848003?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "886848003"},
+        {"title": "Page 51 to Page 53", "durationLabel": "27:15", "durationSeconds": 1635, "videoUrl": "https://vimeo.com/886851823?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "886851823"},
+        {"title": "Page 54 to Page 58", "durationLabel": "38:31", "durationSeconds": 2311, "videoUrl": "https://vimeo.com/886854745?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "886854745"}
+      ]
+    },
+    {
+      "order": 1,
+      "title": "Chapter 2 - Segnali Pericolo",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Presentation", "durationLabel": "29:46", "durationSeconds": 1786, "videoUrl": "https://vimeo.com/1030678538?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "1030678538"},
+        {"title": "Page 59 to Page 65", "durationLabel": "32:14", "durationSeconds": 1934, "videoUrl": "https://vimeo.com/886871820?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "886871820"},
+        {"title": "Page 66 to Page 71", "durationLabel": "31:15", "durationSeconds": 1875, "videoUrl": "https://vimeo.com/886886010?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "886886010"},
+        {"title": "Page 72 to Page 78", "durationLabel": "31:16", "durationSeconds": 1876, "videoUrl": "https://vimeo.com/886917612?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "886917612"},
+        {"title": "Page 79 to Page 87", "durationLabel": "26:35", "durationSeconds": 1595, "videoUrl": "https://vimeo.com/886923669?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "886923669"},
+        {"title": "Page 88 to Page 93", "durationLabel": "32:16", "durationSeconds": 1936, "videoUrl": "https://vimeo.com/886929726?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "886929726"},
+        {"title": "Page 94 to Page 101", "durationLabel": "29:57", "durationSeconds": 1797, "videoUrl": "https://vimeo.com/886936559?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "886936559"},
+        {"title": "Page 102 to Page 108", "durationLabel": "31:50", "durationSeconds": 1910, "videoUrl": "https://vimeo.com/886942083?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "886942083"},
+        {"title": "Page 109 to Page 120", "durationLabel": "57:52", "durationSeconds": 3472, "videoUrl": "https://vimeo.com/1030685705?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "1030685705"},
+        {"title": "Page 121 to Page 129", "durationLabel": "35:04", "durationSeconds": 2104, "videoUrl": "https://vimeo.com/886984576?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "886984576"}
+      ]
+    },
+    {
+      "order": 2,
+      "title": "Chapter 3 - Segnali Divieto",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Presentation + Page 130 to Page 146", "durationLabel": "2:00:08", "durationSeconds": 0, "videoUrl": "https://vimeo.com/1115086948?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "1115086948"},
+        {"title": "Page 147 to Page 153", "durationLabel": "31:17", "durationSeconds": 1877, "videoUrl": "https://vimeo.com/887027139?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887027139"},
+        {"title": "Page 154 to Page 159", "durationLabel": "29:01", "durationSeconds": 1741, "videoUrl": "https://vimeo.com/887028971?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887028971"},
+        {"title": "Page 160 to Page 164", "durationLabel": "29:58", "durationSeconds": 1798, "videoUrl": "https://vimeo.com/887030552?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887030552"},
+        {"title": "Page 165 to Page 175", "durationLabel": "32:12", "durationSeconds": 1932, "videoUrl": "https://vimeo.com/887032258?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887032258"},
+        {"title": "Page 176 to Page 182", "durationLabel": "31:59", "durationSeconds": 1919, "videoUrl": "https://vimeo.com/887034115?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887034115"}
+      ]
+    },
+    {
+      "order": 3,
+      "title": "Chapter 4 - Segnali Obbligo",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 183 to Page 192", "durationLabel": "37:46", "durationSeconds": 2266, "videoUrl": "https://vimeo.com/887035788?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887035788"},
+        {"title": "Page 193 to Page 199", "durationLabel": "26:36", "durationSeconds": 1596, "videoUrl": "https://vimeo.com/887037504?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887037504"},
+        {"title": "Page 200 to Page 207", "durationLabel": "27:26", "durationSeconds": 1646, "videoUrl": "https://vimeo.com/887039527?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887039527"},
+        {"title": "Page 208 to Page 224", "durationLabel": "1:07:52", "durationSeconds": 0, "videoUrl": "https://vimeo.com/887045393?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887045393"}
+      ]
+    },
+    {
+      "order": 4,
+      "title": "Chapter 5 - Segnali Dare Precedenza",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Presentation + Page 225 to Page 246", "durationLabel": "2:25:21", "durationSeconds": 0, "videoUrl": "https://vimeo.com/1113563013?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "1113563013"}
+      ]
+    },
+    {
+      "order": 5,
+      "title": "Chapter 6 - Segnali Orizzontale",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 247 to Page 257", "durationLabel": "31:54", "durationSeconds": 1914, "videoUrl": "https://vimeo.com/887064838?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887064838"},
+        {"title": "Page 258 to Page 266", "durationLabel": "38:34", "durationSeconds": 2314, "videoUrl": "https://vimeo.com/887067463?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887067463"},
+        {"title": "Page 267 to Page 276", "durationLabel": "32:41", "durationSeconds": 1961, "videoUrl": "https://vimeo.com/887204874?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887204874"},
+        {"title": "Page 277 to Page 293", "durationLabel": "1:02:10", "durationSeconds": 0, "videoUrl": "https://vimeo.com/887211184?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887211184"}
+      ]
+    },
+    {
+      "order": 6,
+      "title": "Chapter 7 - Segnalazioni Semaforiche, Agenti Trafico, Oblighi verso Agente",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 294 to Page 304", "durationLabel": "1:01:14", "durationSeconds": 0, "videoUrl": "https://vimeo.com/887339234?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887339234"},
+        {"title": "Page 305 to Page 311", "durationLabel": "33:17", "durationSeconds": 1997, "videoUrl": "https://vimeo.com/887347757?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887347757"},
+        {"title": "Page 312 to Page 315", "durationLabel": "28:16", "durationSeconds": 1696, "videoUrl": "https://vimeo.com/887350207?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887350207"},
+        {"title": "Page 316 to Page 321", "durationLabel": "30:18", "durationSeconds": 1818, "videoUrl": "https://vimeo.com/887354118?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887354118"}
+      ]
+    },
+    {
+      "order": 7,
+      "title": "Chapter 8 - Segnali Indicazione",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 322 to Page 333", "durationLabel": "57:31", "durationSeconds": 3451, "videoUrl": "https://vimeo.com/887358590?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887358590"},
+        {"title": "Page 334 to Page 339", "durationLabel": "29:29", "durationSeconds": 1769, "videoUrl": "https://vimeo.com/1014717483?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "1014717483"},
+        {"title": "Page 340 to Page 346", "durationLabel": "28:19", "durationSeconds": 1699, "videoUrl": "https://vimeo.com/887436022?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887436022"},
+        {"title": "Page 347 to Page 353", "durationLabel": "30:57", "durationSeconds": 1857, "videoUrl": "https://vimeo.com/887580088?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887580088"},
+        {"title": "Page 354 to Page 360", "durationLabel": "29:57", "durationSeconds": 1797, "videoUrl": "https://vimeo.com/887589946?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887589946"},
+        {"title": "Page 361 to Page 368", "durationLabel": "28:08", "durationSeconds": 1688, "videoUrl": "https://vimeo.com/887604702?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887604702"},
+        {"title": "Page 369 to Page 375", "durationLabel": "26:30", "durationSeconds": 1590, "videoUrl": "https://vimeo.com/887608182?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887608182"},
+        {"title": "Page 376 to Page 384", "durationLabel": "34:10", "durationSeconds": 2050, "videoUrl": "https://vimeo.com/887613598?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887613598"}
+      ]
+    },
+    {
+      "order": 8,
+      "title": "Chapter 9 - Segnali Complementari e Temporanei di cantiere",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 385 to Page 395", "durationLabel": "57:03", "durationSeconds": 3423, "videoUrl": "https://vimeo.com/887623719?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887623719"},
+        {"title": "Page 396 to Page 403", "durationLabel": "29:28", "durationSeconds": 1768, "videoUrl": "https://vimeo.com/887631929?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887631929"}
+      ]
+    },
+    {
+      "order": 9,
+      "title": "Chapter 10 - Panello integrativo di Distanza",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 404 to Page 454", "durationLabel": "56:34", "durationSeconds": 3394, "videoUrl": "https://vimeo.com/888445554?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888445554"},
+        {"title": "Page 455 to Page 461", "durationLabel": "26:33", "durationSeconds": 1593, "videoUrl": "https://vimeo.com/888468350?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888468350"},
+        {"title": "Page 462 to Page 466", "durationLabel": "27:10", "durationSeconds": 1630, "videoUrl": "https://vimeo.com/888470955?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888470955"},
+        {"title": "Page 467 to Page 474", "durationLabel": "30:18", "durationSeconds": 1818, "videoUrl": "https://vimeo.com/888477931?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888477931"}
+      ]
+    },
+    {
+      "order": 10,
+      "title": "Chapter 11 - Pericoli nella Circolazione",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 475 to Page 478", "durationLabel": "34:20", "durationSeconds": 2060, "videoUrl": "https://vimeo.com/889042390?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "889042390"},
+        {"title": "Page 479 to Page 484", "durationLabel": "30:34", "durationSeconds": 1834, "videoUrl": "https://vimeo.com/887774739?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887774739"},
+        {"title": "Page 485 to Page 490", "durationLabel": "26:49", "durationSeconds": 1609, "videoUrl": "https://vimeo.com/887776759?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887776759"},
+        {"title": "Page 491 to Page 497", "durationLabel": "29:43", "durationSeconds": 1783, "videoUrl": "https://vimeo.com/887949237?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887949237"},
+        {"title": "Page 498 to Page 505", "durationLabel": "37:05", "durationSeconds": 2225, "videoUrl": "https://vimeo.com/887950945?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887950945"}
+      ]
+    },
+    {
+      "order": 11,
+      "title": "Chapter 12 - Distanza di Sicurezza",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 506 to Page 517", "durationLabel": "59:23", "durationSeconds": 3563, "videoUrl": "https://vimeo.com/887659668?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887659668"},
+        {"title": "Page 518 to Page 522", "durationLabel": "26:44", "durationSeconds": 1604, "videoUrl": "https://vimeo.com/887704813?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887704813"}
+      ]
+    },
+    {
+      "order": 12,
+      "title": "Chapter 13 - Posizione dei Veicoli sulla carregiata, Cambio di corsia e di direzione, Uso controlla della strada, Specchi retrovisiori",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 523 to Page 545", "durationLabel": "34:56", "durationSeconds": 2096, "videoUrl": "https://vimeo.com/887956065?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "887956065"},
+        {"title": "Page 546 to Page 563", "durationLabel": "39:12", "durationSeconds": 2352, "videoUrl": "https://vimeo.com/888004115?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888004115"},
+        {"title": "Page 564 to Page 569", "durationLabel": "30:27", "durationSeconds": 1827, "videoUrl": "https://vimeo.com/888007119?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888007119"},
+        {"title": "Page 570 to Page 575", "durationLabel": "29:08", "durationSeconds": 1748, "videoUrl": "https://vimeo.com/888011032?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888011032"},
+        {"title": "Page 576 to Page 581", "durationLabel": "31:49", "durationSeconds": 1909, "videoUrl": "https://vimeo.com/888013362?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888013362"},
+        {"title": "Page 582 to Page 591", "durationLabel": "29:07", "durationSeconds": 1747, "videoUrl": "https://vimeo.com/888016093?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888016093"},
+        {"title": "Page 592 to Page 596", "durationLabel": "28:00", "durationSeconds": 1680, "videoUrl": "https://vimeo.com/888040463?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888040463"},
+        {"title": "Page 597 to Page 600", "durationLabel": "31:41", "durationSeconds": 1901, "videoUrl": "https://vimeo.com/888050583?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888050583"},
+        {"title": "Page 601 to Page 606", "durationLabel": "31:38", "durationSeconds": 1898, "videoUrl": "https://vimeo.com/888055045?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888055045"}
+      ]
+    },
+    {
+      "order": 13,
+      "title": "Chapter 14- Essempi di precedenza",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Presentation", "durationLabel": "12;37", "durationSeconds": 0, "videoUrl": "https://vimeo.com/905953192?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "905953192"},
+        {"title": "Page 607 to Page 655", "durationLabel": "1;25:25", "durationSeconds": 0, "videoUrl": "https://vimeo.com/910090602?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "910090602"}
+      ]
+    },
+    {
+      "order": 14,
+      "title": "Chapter 15 - Sorpasso",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 656 to Page 664", "durationLabel": "33;03", "durationSeconds": 0, "videoUrl": "https://vimeo.com/888057910?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888057910"},
+        {"title": "Page 665 to Page 673", "durationLabel": "32:57", "durationSeconds": 1977, "videoUrl": "https://vimeo.com/888076575?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888076575"},
+        {"title": "Page 674 to Page 681", "durationLabel": "37:11", "durationSeconds": 2231, "videoUrl": "https://vimeo.com/888078330?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888078330"}
+      ]
+    },
+    {
+      "order": 15,
+      "title": "Chapter 16 - Fermata, Sosta, Arresto e Partenza",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 682 to Page 687", "durationLabel": "32:53", "durationSeconds": 1973, "videoUrl": "https://vimeo.com/888200021?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888200021"},
+        {"title": "Page 688 to Page 692", "durationLabel": "32:19", "durationSeconds": 1939, "videoUrl": "https://vimeo.com/888201060?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888201060"},
+        {"title": "Page 693 to Page 701", "durationLabel": "32:29", "durationSeconds": 1949, "videoUrl": "https://vimeo.com/888206269?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888206269"},
+        {"title": "Page 702 to Page 710", "durationLabel": "32:52", "durationSeconds": 1972, "videoUrl": "https://vimeo.com/888230643?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888230643"}
+      ]
+    },
+    {
+      "order": 16,
+      "title": "Chapter 17 - Circulazione in Autostrada e Stra extraurbana principali, Ingombro della Carregaiata, Uso del triangolo, Carico, Pennelli, Traino. Rischi",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 711 to Page 715", "durationLabel": "27:47", "durationSeconds": 1667, "videoUrl": "https://vimeo.com/888232934?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888232934"},
+        {"title": "Page 716 to Page 722", "durationLabel": "30:46", "durationSeconds": 1846, "videoUrl": "https://vimeo.com/888251495?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888251495"},
+        {"title": "Page 723 to Page 727", "durationLabel": "36:15", "durationSeconds": 2175, "videoUrl": "https://vimeo.com/888256685?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888256685"},
+        {"title": "Page 728 to Page 734", "durationLabel": "35:02", "durationSeconds": 2102, "videoUrl": "https://vimeo.com/888258660?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888258660"},
+        {"title": "Page 735 to Page 744", "durationLabel": "29:54", "durationSeconds": 1794, "videoUrl": "https://vimeo.com/888268265?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888268265"},
+        {"title": "Page 745 to Page 747", "durationLabel": "30:38", "durationSeconds": 1838, "videoUrl": "https://vimeo.com/900749446?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "900749446"},
+        {"title": "Page 748 to Page 750", "durationLabel": "30:15", "durationSeconds": 1815, "videoUrl": "https://vimeo.com/900751103?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "900751103"},
+        {"title": "Page 751 to Page 755", "durationLabel": "37:31", "durationSeconds": 2251, "videoUrl": "https://vimeo.com/888278525?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888278525"},
+        {"title": "Page 756 to Page 761", "durationLabel": "32:21", "durationSeconds": 1941, "videoUrl": "https://vimeo.com/888281442?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888281442"}
+      ]
+    },
+    {
+      "order": 17,
+      "title": "Chapter 18 - Uso della Luci, Spie e Simboli",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 762 to Page 769", "durationLabel": "28:24", "durationSeconds": 1704, "videoUrl": "https://vimeo.com/888289287?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888289287"},
+        {"title": "Page 770 to Page 774", "durationLabel": "33:01", "durationSeconds": 1981, "videoUrl": "https://vimeo.com/888290259?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888290259"},
+        {"title": "Page 775 to Page 786", "durationLabel": "59:04", "durationSeconds": 3544, "videoUrl": "https://vimeo.com/888291403?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888291403"}
+      ]
+    },
+    {
+      "order": 18,
+      "title": "Chapter 19 - Cintura di Sicurezza, Airbag, Sistemi di Ritenut per Bambini, Poggiatesta, Casco protettivo, Abbigliamento di Sicurezza",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 787 to Page 791", "durationLabel": "29:27", "durationSeconds": 1767, "videoUrl": "https://vimeo.com/888296191?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888296191"},
+        {"title": "Page 792 to Page 795", "durationLabel": "29:50", "durationSeconds": 1790, "videoUrl": "https://vimeo.com/888297541?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888297541"},
+        {"title": "Page 796 to Page 799", "durationLabel": "35:27", "durationSeconds": 2127, "videoUrl": "https://vimeo.com/888299315?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888299315"}
+      ]
+    },
+    {
+      "order": 19,
+      "title": "Chapter 20 - Documenti di circolazione, Targa Patenti, Categoie, Sanzioni (Ritro, Revisione, Revoca, Sospensioni, Punti) Validita",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 800 to Page 805", "durationLabel": "30:15", "durationSeconds": 1815, "videoUrl": "https://vimeo.com/888300404?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888300404"},
+        {"title": "Page 806 to Page 808", "durationLabel": "27:48", "durationSeconds": 1668, "videoUrl": "https://vimeo.com/888301287?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "888301287"},
+        {"title": "Page 809 to Page 811", "durationLabel": "31:39", "durationSeconds": 1899, "videoUrl": "https://vimeo.com/891080535?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "891080535"},
+        {"title": "Page 813 to Page 815", "durationLabel": "30:22", "durationSeconds": 1822, "videoUrl": "https://vimeo.com/891459576?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "891459576"},
+        {"title": "Page 816 to Page 819", "durationLabel": "42:31", "durationSeconds": 2551, "videoUrl": "https://vimeo.com/891848987?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "891848987"}
+      ]
+    },
+    {
+      "order": 20,
+      "title": "Chapter 21 - Comprtamenti per prevenier incidenti, Eventi Atmosferici, Comportamento in caso di incidente: Cautele alla Guida di motocicli",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 820 to Page 824", "durationLabel": "27:22", "durationSeconds": 1642, "videoUrl": "https://vimeo.com/892255146?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "892255146"},
+        {"title": "Page 825 to Page 831", "durationLabel": "30:29", "durationSeconds": 1829, "videoUrl": "https://vimeo.com/892257503?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "892257503"},
+        {"title": "Page 832 to Page 836", "durationLabel": "35:32", "durationSeconds": 2132, "videoUrl": "https://vimeo.com/893286610?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "893286610"}
+      ]
+    },
+    {
+      "order": 21,
+      "title": "Chapter 22 - Guida in relazione alla qualita e condizioni fisiche e spichiche, alcool, droga e farmaci, Prima soccorso",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 837 to Page 845", "durationLabel": "30:53", "durationSeconds": 1853, "videoUrl": "https://vimeo.com/893468934?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "893468934"},
+        {"title": "Page 846 to Page 851", "durationLabel": "35:23", "durationSeconds": 2123, "videoUrl": "https://vimeo.com/893735048?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "893735048"},
+        {"title": "Page 851 to Page 857", "durationLabel": "28:48", "durationSeconds": 1728, "videoUrl": "https://vimeo.com/894032983?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "894032983"}
+      ]
+    },
+    {
+      "order": 22,
+      "title": "Chapter 23 - Responsabilita Civile, Penale e amministrativa, Assicurazzione R.C.A Autovalutazione del conducente e percezione del rischio, attenzione durante la guida",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 858 to Page 863", "durationLabel": "32:43", "durationSeconds": 1963, "videoUrl": "https://vimeo.com/895290041?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "895290041"},
+        {"title": "Page 864 to Page 873", "durationLabel": "38:05", "durationSeconds": 2285, "videoUrl": "https://vimeo.com/895359645?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "895359645"}
+      ]
+    },
+    {
+      "order": 23,
+      "title": "Chapter 24 - Limitazione dei consumi, rispetto dell'ambiente e inquinamento",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 874 to Page 879", "durationLabel": "35:02", "durationSeconds": 2102, "videoUrl": "https://vimeo.com/896671423?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "896671423"},
+        {"title": "Page 880 to Page 889", "durationLabel": "38:59", "durationSeconds": 2339, "videoUrl": "https://vimeo.com/897568046?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "897568046"}
+      ]
+    },
+    {
+      "order": 24,
+      "title": "Chapter 25 - Uso e Manutenzione di : Pneumatici: Freni: Sospensione : Ammortizzatori: Sterzo: Scarico : Controlli e Cautele : Aderenza e Stabilita del Veicolo",
+      "description": "",
+      "published": true,
+      "videos": [
+        {"title": "Page 890 to Page 895", "durationLabel": "33:24", "durationSeconds": 2004, "videoUrl": "https://vimeo.com/898329054?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "898329054"},
+        {"title": "Page 896 to Page 901", "durationLabel": "33:14", "durationSeconds": 1994, "videoUrl": "https://vimeo.com/900808559?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "900808559"},
+        {"title": "Page 902 to Page 907", "durationLabel": "38:15", "durationSeconds": 2295, "videoUrl": "https://vimeo.com/901077709?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "901077709"},
+        {"title": "Page 908 to Page 910", "durationLabel": "31:46", "durationSeconds": 1906, "videoUrl": "https://vimeo.com/903025845?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "903025845"},
+        {"title": "Page 911 to Page 914", "durationLabel": "33:18", "durationSeconds": 1998, "videoUrl": "https://vimeo.com/903349365?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "903349365"},
+        {"title": "Page 915 to Page 923", "durationLabel": "27:49", "durationSeconds": 1669, "videoUrl": "https://vimeo.com/905121364?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "905121364"},
+        {"title": "Page 924 to Page 926", "durationLabel": "33:05", "durationSeconds": 1985, "videoUrl": "https://vimeo.com/913253208?fl=pl&fe=cm", "provider": "vimeo", "providerAssetId": "913253208"}
+      ]
+    }
+  ]
+}

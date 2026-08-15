@@ -173,23 +173,9 @@ Blocked users cannot log in (`403`: `Your account has been blocked. Contact supp
 
 ## Seed
 
-Progress `>= 0.95` or `completed: true` marks the video complete.
-
-Locked premium video in lists:
-
-```json
-{
-  "title": "Lecture 2",
-  "isPremium": true,
-  "isLocked": true,
-  "videoUrl": null,
-  "message": "Premium subscription required"
-}
-```
-
-## Seed
-
 ```bash
 npm run seed:demo
 npm run seed:courses
 ```
+
+`seed:courses` upserts **Driving License Type B** from `data/SEED_DRIVING_LICENSE_TYPE_B.json` (25 published chapters, 117 Vimeo lectures). The first two lectures in each chapter are free; the rest are premium. The old stub course `Road Safety & Traffic Rules` is removed.
