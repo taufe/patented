@@ -3,7 +3,10 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const adminCourseRoutes = require('./routes/admin/courseRoutes');
+const adminDashboardRoutes = require('./routes/admin/dashboardRoutes');
+const adminUserRoutes = require('./routes/admin/userRoutes');
 const userCourseRoutes = require('./routes/user/courseRoutes');
+const meRoutes = require('./routes/user/meRoutes');
 const { mountSwagger } = require('./config/swagger');
 const {
   getMongoUri,
@@ -126,7 +129,10 @@ app.use(async (req, res, next) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminDashboardRoutes);
+app.use('/api/admin', adminUserRoutes);
 app.use('/api/admin', adminCourseRoutes);
+app.use('/api', meRoutes);
 app.use('/api', userCourseRoutes);
 
 module.exports = app;

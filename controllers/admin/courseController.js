@@ -289,6 +289,30 @@ const reorderCourses = async (req, res) => {
   }
 };
 
+const listCourseOptions = async (req, res) => {
+  try {
+    const courses = await Course.find()
+      .sort({ order: 1, createdAt: -1 })
+      .select('title status');
+
+    res.json({
+      success: true,
+      message: 'Course options fetched successfully',
+      courses: courses.map((course) => ({
+        _id: course._id,
+        title: course.title,
+        status: course.status,
+      })),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching course options',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   listCourses,
   getCourse,
@@ -296,4 +320,5 @@ module.exports = {
   updateCourse,
   deleteCourse,
   reorderCourses,
+  listCourseOptions,
 };

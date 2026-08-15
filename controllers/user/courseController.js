@@ -6,7 +6,6 @@ const { isValidId, invalidIdResponse } = require('../../utils/ids');
 const { formatDurationLabel } = require('../../utils/duration');
 const { getPagination, paginationMeta } = require('../../utils/pagination');
 const {
-  userHasActiveSubscription,
   isVideoLocked,
 } = require('../../utils/subscription');
 
@@ -238,10 +237,7 @@ const getChapter = async (req, res) => {
       });
     }
 
-    const [videos, hasSubscription] = await Promise.all([
-      Video.find({ chapterId, published: true }).sort({ order: 1 }),
-      userHasActiveSubscription(req.user),
-    ]);
+    const videos = await Video.find({ chapterId, published: true }).sort({ order: 1 });
 
     const progressRows = await VideoProgress.find({
       userId: req.user._id,
@@ -256,7 +252,7 @@ const getChapter = async (req, res) => {
       message: 'Chapter fetched successfully',
       chapter,
       videos: videos.map((video) => {
-        const locked = isVideoLocked(video, hasSubscription) || (course.isPremium && !video.isFree && !hasSubscription);
+        const locked = isVideoLocked(video, req.user, course);
         const row = progressByVideo.get(String(video._id));
         return toPublicVideo(video, {
           locked,
@@ -298,10 +294,9 @@ const getVideo = async (req, res) => {
       });
     }
 
-    const [course, chapter, hasSubscription, progressRow] = await Promise.all([
+    const [course, chapter, progressRow] = await Promise.all([
       Course.findById(video.courseId),
       Chapter.findById(video.chapterId),
-      userHasActiveSubscription(req.user),
       VideoProgress.findOne({ userId: req.user._id, videoId }),
     ]);
 
@@ -317,9 +312,7 @@ const getVideo = async (req, res) => {
       });
     }
 
-    const locked =
-      isVideoLocked(video, hasSubscription) ||
-      (course.isPremium && !video.isFree && !hasSubscription);
+    const locked = isVideoLocked(video, req.user, course);
 
     if (locked) {
       return res.status(403).json({

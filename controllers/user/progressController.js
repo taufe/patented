@@ -4,10 +4,7 @@ const Video = require('../../models/Video');
 const VideoProgress = require('../../models/VideoProgress');
 const { isValidId, invalidIdResponse } = require('../../utils/ids');
 const { toNumber } = require('../../utils/duration');
-const {
-  userHasActiveSubscription,
-  isVideoLocked,
-} = require('../../utils/subscription');
+const { isVideoLocked } = require('../../utils/subscription');
 const { toPublicVideo } = require('./courseController');
 
 const clampProgress = (value) => Math.min(1, Math.max(0, Number(value) || 0));
@@ -37,10 +34,9 @@ const saveProgress = async (req, res) => {
       });
     }
 
-    const [course, chapter, hasSubscription] = await Promise.all([
+    const [course, chapter] = await Promise.all([
       Course.findById(video.courseId),
       Chapter.findById(video.chapterId),
-      userHasActiveSubscription(req.user),
     ]);
 
     if (!course || course.status !== 'Published' || !chapter || !chapter.published) {
@@ -50,9 +46,7 @@ const saveProgress = async (req, res) => {
       });
     }
 
-    const locked =
-      isVideoLocked(video, hasSubscription) ||
-      (course.isPremium && !video.isFree && !hasSubscription);
+    const locked = isVideoLocked(video, req.user, course);
 
     if (locked) {
       return res.status(403).json({
@@ -113,10 +107,9 @@ const mapWatchItems = async (user, rows) => {
   const videoMap = new Map(videos.map((video) => [String(video._id), video]));
   const courseIds = [...new Set(videos.map((video) => String(video.courseId)))];
   const chapterIds = [...new Set(videos.map((video) => String(video.chapterId)))];
-  const [courses, chapters, hasSubscription] = await Promise.all([
+  const [courses, chapters] = await Promise.all([
     Course.find({ _id: { $in: courseIds } }),
     Chapter.find({ _id: { $in: chapterIds } }),
-    userHasActiveSubscription(user),
   ]);
   const courseMap = new Map(courses.map((course) => [String(course._id), course]));
   const chapterMap = new Map(chapters.map((chapter) => [String(chapter._id), chapter]));
@@ -138,9 +131,7 @@ const mapWatchItems = async (user, rows) => {
         return null;
       }
 
-      const locked =
-        isVideoLocked(video, hasSubscription) ||
-        (course.isPremium && !video.isFree && !hasSubscription);
+      const locked = isVideoLocked(video, user, course);
 
       return {
         course: {

@@ -7,6 +7,7 @@ const {
   updateCourse,
   deleteCourse,
   reorderCourses,
+  listCourseOptions,
 } = require('../../controllers/admin/courseController');
 const {
   listChapters,
@@ -28,6 +29,7 @@ const router = express.Router();
 router.use(protect, adminOnly);
 
 router.get('/courses', listCourses);
+router.get('/courses/options', listCourseOptions);
 router.patch('/courses/reorder', reorderCourses);
 router.post('/courses', createCourse);
 router.get('/courses/:courseId', getCourse);

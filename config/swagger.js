@@ -49,6 +49,18 @@ const swaggerDefinition = {
       name: 'User Courses',
       description: 'Published courses, playback, and watch progress',
     },
+    {
+      name: 'Profile',
+      description: 'Current user profile and account settings',
+    },
+    {
+      name: 'Admin Dashboard',
+      description: 'Admin overview stats',
+    },
+    {
+      name: 'Admin Users',
+      description: 'Admin user management and course unlock',
+    },
   ],
 };
 
@@ -58,6 +70,7 @@ const swaggerOptions = {
     path.join(__dirname, '../docs/swagger/schemas.js'),
     path.join(__dirname, '../docs/swagger/paths.js'),
     path.join(__dirname, '../docs/swagger/coursePaths.js'),
+    path.join(__dirname, '../docs/swagger/accountPaths.js'),
   ],
 };
 

@@ -114,9 +114,64 @@ curl -X POST http://localhost:5001/api/videos/VIDEO_ID/progress \
 
 - `GET /api/courses/:courseId`
 - `GET /api/courses/:courseId/chapters`
-- `GET /api/videos/:videoId` — `403` if premium and no subscription (`user.isPremium`)
+- `GET /api/videos/:videoId` — `403` if premium and no subscription (`user.isPremium` or course not in `unlockedCourses`)
 - `GET /api/me/continue-watching`
 - `GET /api/me/watch-history`
+
+Progress `>= 0.95` or `completed: true` marks the video complete.
+
+Locked premium video in lists:
+
+```json
+{
+  "title": "Lecture 2",
+  "isPremium": true,
+  "isLocked": true,
+  "videoUrl": null,
+  "message": "Premium subscription required"
+}
+```
+
+## Dashboard, profile, users
+
+```bash
+# Dashboard
+curl http://localhost:5001/api/admin/dashboard \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+
+# Profile
+curl http://localhost:5001/api/me \
+  -H "Authorization: Bearer $TOKEN"
+
+curl -X PATCH http://localhost:5001/api/me \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"John Doe","phone":"+92 300 1234567","country":"Pakistan"}'
+
+# Change password
+curl -X PATCH http://localhost:5001/api/auth/change-password \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"currentPassword":"User@123","newPassword":"NewPass@123","confirmPassword":"NewPass@123"}'
+
+# Users
+curl "http://localhost:5001/api/admin/users?search=&status=all&page=1" \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+
+curl -X PATCH http://localhost:5001/api/admin/users/USER_ID/block \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"isBlocked":true}'
+
+curl -X PATCH http://localhost:5001/api/admin/users/USER_ID/course-access \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"courseId":"COURSE_ID","unlocked":true}'
+```
+
+Blocked users cannot log in (`403`: `Your account has been blocked. Contact support.`).
+
+## Seed
 
 Progress `>= 0.95` or `completed: true` marks the video complete.
 

@@ -19,6 +19,18 @@ const DEMO_ACCOUNTS = [
     password: 'Admin@123',
     role: 'admin',
   },
+  {
+    name: 'Ahmed Ali',
+    email: 'ahmed@example.com',
+    password: 'User@123',
+    role: 'user',
+  },
+  {
+    name: 'Muhammad Qaseem',
+    email: 'qaseem@example.com',
+    password: 'User@123',
+    role: 'user',
+  },
 ];
 
 const seed = async () => {

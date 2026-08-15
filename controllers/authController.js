@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { getJwtSecret } = require('../config/env');
+const { toPublicUser } = require('../utils/userResponse');
 const { sendPasswordResetCode } = require('../utils/email');
 const {
   normalizeEmail,
@@ -17,19 +18,6 @@ const RESEND_COOLDOWN_MS = 60 * 1000;
 
 const RESET_FIELDS =
   '+resetPasswordCode +resetPasswordCodeExpires +resetPasswordCodeSentAt +resetPasswordToken +resetPasswordTokenExpires';
-
-const toPublicUser = (user) => {
-  const userResponse = user.toObject();
-  delete userResponse.password;
-  delete userResponse.resetPasswordCode;
-  delete userResponse.resetPasswordCodeExpires;
-  delete userResponse.resetPasswordCodeSentAt;
-  delete userResponse.resetPasswordToken;
-  delete userResponse.resetPasswordTokenExpires;
-  userResponse.role = userResponse.role === 'admin' ? 'admin' : 'user';
-  userResponse.isPremium = Boolean(userResponse.isPremium);
-  return userResponse;
-};
 
 const generateToken = (user) => {
   const role = user.role === 'admin' ? 'admin' : 'user';
@@ -131,6 +119,19 @@ const login = async (req, res) => {
         message: 'Invalid email or password',
       });
     }
+
+    if (user.isBlocked) {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account has been blocked. Contact support.',
+      });
+    }
+
+    user.lastLoginAt = new Date();
+    user.lastDevice = (req.body.device || req.headers['x-device'] || user.lastDevice || '')
+      .toString()
+      .trim();
+    await user.save();
 
     const token = generateToken(user);
     const publicUser = toPublicUser(user);
@@ -387,10 +388,73 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide current password, new password, and confirm password',
+      });
+    }
+
+    const passwordError = validatePassword(newPassword);
+
+    if (passwordError) {
+      return res.status(400).json({
+        success: false,
+        message: passwordError,
+      });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Passwords do not match',
+      });
+    }
+
+    const user = await User.findById(req.user._id).select('+password');
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Not authorized, user not found',
+      });
+    }
+
+    const isCurrentValid = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isCurrentValid) {
+      return res.status(401).json({
+        success: false,
+        message: 'Current password is incorrect',
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Password updated successfully',
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error during password update',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
   forgotPassword,
   verifyResetCode,
   resetPassword,
+  changePassword,
 };
