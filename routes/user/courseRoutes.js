@@ -9,6 +9,7 @@ const {
 } = require('../../controllers/user/courseController');
 const {
   saveProgress,
+  getProgress,
   continueWatching,
   watchHistory,
 } = require('../../controllers/user/progressController');
@@ -23,6 +24,7 @@ router.get('/courses/:courseId/chapters', listChapters);
 router.get('/courses/:courseId/chapters/:chapterId', getChapter);
 
 router.get('/videos/:videoId', getVideo);
+router.get('/videos/:videoId/progress', getProgress);
 router.post('/videos/:videoId/progress', saveProgress);
 
 router.get('/me/continue-watching', continueWatching);

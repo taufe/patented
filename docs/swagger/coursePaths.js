@@ -309,6 +309,18 @@
  *         description: Premium subscription required
  *
  * /api/videos/{videoId}/progress:
+ *   get:
+ *     tags: [User Courses]
+ *     summary: Get saved progress for a video
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: videoId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Progress fetched
  *   post:
  *     tags: [User Courses]
  *     summary: Save watch progress

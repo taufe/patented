@@ -52,6 +52,16 @@ const getSmtpFrom = () =>
 const isEmailConfigured = () =>
   Boolean(getSmtpHost() && getSmtpUser() && getSmtpPass());
 
+const getVideoCompletionThreshold = () => {
+  const parsed = Number(process.env.VIDEO_COMPLETION_THRESHOLD || 0.95);
+
+  if (!Number.isFinite(parsed) || parsed <= 0 || parsed > 1) {
+    return 0.95;
+  }
+
+  return parsed;
+};
+
 const logEnvDiagnostics = () => {
   const mongoUri = getMongoUri();
 
@@ -74,4 +84,5 @@ module.exports = {
   isEmailConfigured,
   isVercel,
   logEnvDiagnostics,
+  getVideoCompletionThreshold,
 };

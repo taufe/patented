@@ -9,120 +9,134 @@ const Video = require('../models/Video');
 const VideoProgress = require('../models/VideoProgress');
 const connectDB = require('../config/db');
 const { recountChapter, recountCourse } = require('../services/contentCounters');
+const { formatDurationLabel } = require('../utils/duration');
 
-const COURSE_TITLE = 'Driving License Type B';
+const SAMPLE_VIMEO_URL = 'https://vimeo.com/76979871';
+const SAMPLE_ASSET_ID = '76979871';
 
-const seed = async () => {
-  await connectDB();
+const COURSE_SPECS = [
+  {
+    title: 'Driving License Type B',
+    description: 'Complete Type B driving license video course.',
+    thumbnailUrl: 'https://placehold.co/800x450/png?text=Driving+License+Type+B',
+    order: 1,
+  },
+  {
+    title: 'Road Safety & Traffic Rules',
+    description: 'Road safety, signs, and traffic rules for learners.',
+    thumbnailUrl: 'https://placehold.co/800x450/png?text=Road+Safety',
+    order: 2,
+  },
+];
 
-  const admin = await User.findOne({ role: 'admin' });
+const CHAPTER_TITLES = [
+  'Introduction',
+  'Basic Controls',
+  'Traffic Signs',
+  'Rules of the Road',
+  'City Driving',
+  'Highway Driving',
+  'Parking',
+  'Final Review',
+];
 
-  let course = await Course.findOne({ title: COURSE_TITLE });
+const LECTURE_TITLES = [
+  'Overview',
+  'Key Concepts',
+  'Practical Demo',
+  'Common Mistakes',
+  'Safety Tips',
+  'Practice Drill',
+  'Quiz Recap',
+  'Summary',
+];
+
+const seedCourse = async ({ spec, admin, courseIndex }) => {
+  let course = await Course.findOne({ title: spec.title });
 
   if (course) {
     await VideoProgress.deleteMany({ courseId: course._id });
     await Video.deleteMany({ courseId: course._id });
     await Chapter.deleteMany({ courseId: course._id });
-    course.title = COURSE_TITLE;
-    course.description = 'Complete Type B driving license video course.';
-    course.instructor = 'Admin';
-    course.thumbnailUrl = 'https://placehold.co/800x450/png?text=Driving+License+Type+B';
-    course.status = 'Published';
-    course.isPremium = false;
-    course.quizAvailable = true;
-    course.order = 1;
-    course.createdBy = admin ? admin._id : course.createdBy;
-    await course.save();
-    console.log('Updated course:', COURSE_TITLE);
-  } else {
-    course = await Course.create({
-      title: COURSE_TITLE,
-      description: 'Complete Type B driving license video course.',
+    course.set({
+      title: spec.title,
+      description: spec.description,
       instructor: 'Admin',
-      thumbnailUrl: 'https://placehold.co/800x450/png?text=Driving+License+Type+B',
+      thumbnailUrl: spec.thumbnailUrl,
       status: 'Published',
       isPremium: false,
       quizAvailable: true,
-      order: 1,
+      order: spec.order,
+      createdBy: admin ? admin._id : course.createdBy,
+    });
+    await course.save();
+    console.log('Updated course:', spec.title);
+  } else {
+    course = await Course.create({
+      title: spec.title,
+      description: spec.description,
+      instructor: 'Admin',
+      thumbnailUrl: spec.thumbnailUrl,
+      status: 'Published',
+      isPremium: false,
+      quizAvailable: true,
+      order: spec.order,
       createdBy: admin ? admin._id : undefined,
     });
-    console.log('Created course:', COURSE_TITLE);
+    console.log('Created course:', spec.title);
   }
 
-  const chapter1 = await Chapter.create({
-    courseId: course._id,
-    title: 'Chapter 1 - Introduction',
-    description: 'Get started with the Type B driving license course.',
-    published: true,
-    order: 0,
-  });
-
-  const chapter2 = await Chapter.create({
-    courseId: course._id,
-    title: 'Chapter 2 - Rules of the Road',
-    description: 'Core traffic rules and practical examples.',
-    published: true,
-    order: 1,
-  });
-
-  await Video.create([
-    {
+  for (let chapterIndex = 0; chapterIndex < CHAPTER_TITLES.length; chapterIndex += 1) {
+    const chapter = await Chapter.create({
       courseId: course._id,
-      chapterId: chapter1._id,
-      title: 'Lecture 1 - Welcome',
-      description: 'Intro lecture',
-      thumbnailUrl: 'https://placehold.co/800x450/png?text=Lecture+1',
-      videoUrl: 'https://vimeo.com/76979871',
-      durationSeconds: 510,
-      durationLabel: '08:30',
+      title: `Chapter ${chapterIndex + 1} - ${CHAPTER_TITLES[chapterIndex]}`,
+      description: `${CHAPTER_TITLES[chapterIndex]} for ${spec.title}.`,
       published: true,
-      isPremium: false,
-      isFree: true,
-      order: 0,
-      provider: 'vimeo',
-      providerAssetId: '76979871',
-    },
-    {
-      courseId: course._id,
-      chapterId: chapter1._id,
-      title: 'Lecture 2 - Course Overview',
-      description: 'What you will learn in this series.',
-      thumbnailUrl: 'https://placehold.co/800x450/png?text=Lecture+2',
-      videoUrl: 'https://vimeo.com/76979871',
-      durationSeconds: 600,
-      durationLabel: '10:00',
-      published: true,
-      isPremium: true,
-      isFree: false,
-      order: 1,
-      provider: 'vimeo',
-      providerAssetId: '76979871',
-    },
-    {
-      courseId: course._id,
-      chapterId: chapter2._id,
-      title: 'Lecture 3 - Traffic Signs',
-      description: 'Essential traffic signs.',
-      thumbnailUrl: 'https://placehold.co/800x450/png?text=Lecture+3',
-      videoUrl: 'https://vimeo.com/76979871',
-      durationSeconds: 420,
-      durationLabel: '07:00',
-      published: true,
-      isPremium: false,
-      isFree: true,
-      order: 0,
-      provider: 'vimeo',
-      providerAssetId: '76979871',
-    },
-  ]);
+      order: chapterIndex,
+    });
 
-  await Promise.all([
-    recountChapter(chapter1._id),
-    recountChapter(chapter2._id),
-    recountCourse(course._id),
-  ]);
+    const videos = LECTURE_TITLES.map((lectureTitle, lectureIndex) => {
+      const isFree = lectureIndex < 2;
+      const durationSeconds = 420 + (courseIndex + chapterIndex + lectureIndex) * 15;
 
-  console.log('Seeded 2 chapters and 3 videos');
+      return {
+        courseId: course._id,
+        chapterId: chapter._id,
+        title: `Lecture ${lectureIndex + 1} - ${lectureTitle}`,
+        description: `${lectureTitle} in ${chapter.title}.`,
+        thumbnailUrl: `https://placehold.co/800x450/png?text=L${lectureIndex + 1}`,
+        videoUrl: SAMPLE_VIMEO_URL,
+        durationSeconds,
+        durationLabel: formatDurationLabel(durationSeconds),
+        published: true,
+        isPremium: !isFree,
+        isFree,
+        order: lectureIndex,
+        provider: 'vimeo',
+        providerAssetId: SAMPLE_ASSET_ID,
+      };
+    });
+
+    await Video.insertMany(videos);
+    await recountChapter(chapter._id);
+  }
+
+  await recountCourse(course._id);
+};
+
+const seed = async () => {
+  await connectDB();
+  const admin = await User.findOne({ role: 'admin' });
+
+  for (let index = 0; index < COURSE_SPECS.length; index += 1) {
+    await seedCourse({
+      spec: COURSE_SPECS[index],
+      admin,
+      courseIndex: index,
+    });
+  }
+
+  console.log('Seeded 2 courses, 8 chapters each, 8 lectures each');
   process.exit(0);
 };
 

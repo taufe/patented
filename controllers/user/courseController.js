@@ -5,9 +5,8 @@ const VideoProgress = require('../../models/VideoProgress');
 const { isValidId, invalidIdResponse } = require('../../utils/ids');
 const { formatDurationLabel } = require('../../utils/duration');
 const { getPagination, paginationMeta } = require('../../utils/pagination');
-const {
-  isVideoLocked,
-} = require('../../utils/subscription');
+const { isVideoLocked } = require('../../utils/subscription');
+const { toUserProgress } = require('../../utils/learningProgress');
 
 const PUBLISHED_COURSE = { status: 'Published' };
 
@@ -55,8 +54,8 @@ const toPublicVideo = (video, { locked = false, progress = null } = {}) => {
     providerAssetId: locked ? '' : value.providerAssetId,
     videoUrl: locked ? null : value.videoUrl,
     playbackId: locked ? '' : value.playbackId,
+    userProgress: progress || null,
     ...(locked ? { message: 'Premium subscription required' } : {}),
-    ...(progress ? { userProgress: progress } : {}),
   };
 };
 
@@ -65,26 +64,82 @@ const getPublishedChapterIds = async (courseId) => {
   return chapters.map((chapter) => chapter._id);
 };
 
-const getCourseProgress = async (userId, courseId) => {
+const getCourseLearningStats = async (userId, courseId) => {
   const chapterIds = await getPublishedChapterIds(courseId);
   const videos = await Video.find({
     courseId,
     chapterId: { $in: chapterIds },
     published: true,
   }).select('_id');
+  const totalVideos = videos.length;
+  const totalChapters = chapterIds.length;
 
-  if (videos.length === 0) {
-    return 0;
+  if (totalVideos === 0) {
+    return { progress: 0, totalChapters, totalVideos, completedVideos: 0 };
   }
 
-  const videoIds = videos.map((video) => video._id);
-  const completedCount = await VideoProgress.countDocuments({
+  const completedVideos = await VideoProgress.countDocuments({
     userId,
-    videoId: { $in: videoIds },
+    videoId: { $in: videos.map((video) => video._id) },
     completed: true,
   });
 
-  return Number((completedCount / videos.length).toFixed(4));
+  return {
+    progress: Number((completedVideos / totalVideos).toFixed(4)),
+    totalChapters,
+    totalVideos,
+    completedVideos,
+  };
+};
+
+const getChapterSummaries = async (userId, chapters) => {
+  if (chapters.length === 0) {
+    return [];
+  }
+
+  const chapterIds = chapters.map((chapter) => chapter._id);
+  const videos = await Video.find({
+    chapterId: { $in: chapterIds },
+    published: true,
+  }).select('_id chapterId');
+
+  const videoIdsByChapter = new Map();
+  videos.forEach((video) => {
+    const key = String(video.chapterId);
+    const list = videoIdsByChapter.get(key) || [];
+    list.push(video._id);
+    videoIdsByChapter.set(key, list);
+  });
+
+  const completedRows = await VideoProgress.find({
+    userId,
+    videoId: { $in: videos.map((video) => video._id) },
+    completed: true,
+  }).select('videoId');
+  const completedSet = new Set(completedRows.map((row) => String(row.videoId)));
+
+  return chapters.map((chapter) => {
+    const value = chapter.toObject ? chapter.toObject() : { ...chapter };
+    const ids = videoIdsByChapter.get(String(chapter._id)) || [];
+    const completedVideos = ids.filter((id) => completedSet.has(String(id))).length;
+    const totalVideos = ids.length;
+    const progress = totalVideos === 0 ? 0 : Number((completedVideos / totalVideos).toFixed(4));
+
+    return {
+      _id: value._id,
+      courseId: value.courseId,
+      title: value.title,
+      description: value.description,
+      published: value.published,
+      order: value.order,
+      totalVideos,
+      completedVideos,
+      progress,
+      completed: totalVideos > 0 && progress === 1,
+      createdAt: value.createdAt,
+      updatedAt: value.updatedAt,
+    };
+  });
 };
 
 const listCourses = async (req, res) => {
@@ -102,16 +157,19 @@ const listCourses = async (req, res) => {
     }
 
     const [courses, total] = await Promise.all([
-      Course.find(filter).sort({ order: 1, createdAt: -1 }).skip(skip).limit(limit),
+      Course.find(filter).sort({ order: 1, createdAt: 1 }).skip(skip).limit(limit),
       Course.countDocuments(filter),
     ]);
 
     const withProgress = await Promise.all(
-      courses.map(async (course) =>
-        toPublicCourse(course, {
-          progress: await getCourseProgress(req.user._id, course._id),
-        })
-      )
+      courses.map(async (course) => {
+        const stats = await getCourseLearningStats(req.user._id, course._id);
+        return toPublicCourse(course, {
+          progress: stats.progress,
+          totalChapters: stats.totalChapters,
+          totalVideos: stats.totalVideos,
+        });
+      })
     );
 
     res.json({
@@ -147,23 +205,20 @@ const getCourse = async (req, res) => {
     }
 
     const chapters = await Chapter.find({ courseId, published: true }).sort({ order: 1 });
-    const progress = await getCourseProgress(req.user._id, courseId);
+    const [stats, chapterSummaries] = await Promise.all([
+      getCourseLearningStats(req.user._id, courseId),
+      getChapterSummaries(req.user._id, chapters),
+    ]);
 
     res.json({
       success: true,
       message: 'Course fetched successfully',
-      course: toPublicCourse(course, { progress }),
-      chapters: chapters.map((chapter) => ({
-        _id: chapter._id,
-        courseId: chapter.courseId,
-        title: chapter.title,
-        description: chapter.description,
-        published: chapter.published,
-        order: chapter.order,
-        totalVideos: chapter.totalVideos,
-        createdAt: chapter.createdAt,
-        updatedAt: chapter.updatedAt,
-      })),
+      course: toPublicCourse(course, {
+        progress: stats.progress,
+        totalChapters: stats.totalChapters,
+        totalVideos: stats.totalVideos,
+      }),
+      chapters: chapterSummaries,
     });
   } catch (error) {
     res.status(500).json({
@@ -192,11 +247,12 @@ const listChapters = async (req, res) => {
     }
 
     const chapters = await Chapter.find({ courseId, published: true }).sort({ order: 1 });
+    const chapterSummaries = await getChapterSummaries(req.user._id, chapters);
 
     res.json({
       success: true,
       message: 'Chapters fetched successfully',
-      chapters,
+      chapters: chapterSummaries,
     });
   } catch (error) {
     res.status(500).json({
@@ -246,25 +302,35 @@ const getChapter = async (req, res) => {
     const progressByVideo = new Map(
       progressRows.map((row) => [String(row.videoId), row])
     );
+    const completedVideos = progressRows.filter((row) => row.completed).length;
+    const totalVideos = videos.length;
+    const chapterProgress =
+      totalVideos === 0 ? 0 : Number((completedVideos / totalVideos).toFixed(4));
+    const chapterValue = chapter.toObject();
 
     res.json({
       success: true,
       message: 'Chapter fetched successfully',
-      chapter,
+      chapter: {
+        _id: chapterValue._id,
+        courseId: chapterValue.courseId,
+        title: chapterValue.title,
+        description: chapterValue.description,
+        published: chapterValue.published,
+        order: chapterValue.order,
+        totalVideos,
+        completedVideos,
+        progress: chapterProgress,
+        completed: totalVideos > 0 && chapterProgress === 1,
+        createdAt: chapterValue.createdAt,
+        updatedAt: chapterValue.updatedAt,
+      },
       videos: videos.map((video) => {
         const locked = isVideoLocked(video, req.user, course);
         const row = progressByVideo.get(String(video._id));
         return toPublicVideo(video, {
           locked,
-          progress: row
-            ? {
-                positionSeconds: row.positionSeconds,
-                durationSeconds: row.durationSeconds,
-                progress: row.progress,
-                completed: row.completed,
-                lastWatchedAt: row.lastWatchedAt,
-              }
-            : null,
+          progress: toUserProgress(row),
         });
       }),
     });
@@ -327,15 +393,7 @@ const getVideo = async (req, res) => {
       message: 'Video fetched successfully',
       video: toPublicVideo(video, {
         locked: false,
-            progress: progressRow
-          ? {
-              positionSeconds: progressRow.positionSeconds,
-              durationSeconds: progressRow.durationSeconds,
-              progress: progressRow.progress,
-              completed: progressRow.completed,
-              lastWatchedAt: progressRow.lastWatchedAt,
-            }
-          : null,
+        progress: toUserProgress(progressRow),
       }),
     });
   } catch (error) {
