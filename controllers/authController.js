@@ -18,8 +18,23 @@ const RESEND_COOLDOWN_MS = 60 * 1000;
 const RESET_FIELDS =
   '+resetPasswordCode +resetPasswordCodeExpires +resetPasswordCodeSentAt +resetPasswordToken +resetPasswordTokenExpires';
 
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, getJwtSecret(), {
+const toPublicUser = (user) => {
+  const userResponse = user.toObject();
+  delete userResponse.password;
+  delete userResponse.resetPasswordCode;
+  delete userResponse.resetPasswordCodeExpires;
+  delete userResponse.resetPasswordCodeSentAt;
+  delete userResponse.resetPasswordToken;
+  delete userResponse.resetPasswordTokenExpires;
+  userResponse.role = userResponse.role === 'admin' ? 'admin' : 'user';
+  userResponse.isPremium = Boolean(userResponse.isPremium);
+  return userResponse;
+};
+
+const generateToken = (user) => {
+  const role = user.role === 'admin' ? 'admin' : 'user';
+
+  return jwt.sign({ id: user._id, role }, getJwtSecret(), {
     expiresIn: '1d',
   });
 };
@@ -39,7 +54,25 @@ const register = async (req, res) => {
       });
     }
 
-    const existingUser = await User.findOne({ email });
+    const normalizedEmail = normalizeEmail(email);
+
+    if (!isValidEmail(normalizedEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address',
+      });
+    }
+
+    const passwordError = validatePassword(password);
+
+    if (passwordError) {
+      return res.status(400).json({
+        success: false,
+        message: passwordError,
+      });
+    }
+
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res.status(409).json({
         success: false,
@@ -52,17 +85,15 @@ const register = async (req, res) => {
 
     const user = await User.create({
       name,
-      email,
+      email: normalizedEmail,
       password: hashedPassword,
+      role: 'user',
     });
-
-    const userResponse = user.toObject();
-    delete userResponse.password;
 
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
-      user: userResponse,
+      user: toPublicUser(user),
     });
   } catch (error) {
     res.status(500).json({
@@ -84,7 +115,8 @@ const login = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email });
+    const normalizedEmail = normalizeEmail(email);
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -100,16 +132,15 @@ const login = async (req, res) => {
       });
     }
 
-    const token = generateToken(user._id);
-
-    const userResponse = user.toObject();
-    delete userResponse.password;
+    const token = generateToken(user);
+    const publicUser = toPublicUser(user);
 
     res.status(200).json({
       success: true,
       message: 'Login successful',
       token,
-      user: userResponse,
+      role: publicUser.role,
+      user: publicUser,
     });
   } catch (error) {
     res.status(500).json({

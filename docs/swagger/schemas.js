@@ -24,6 +24,10 @@
  *           items:
  *             type: string
  *           example: [reading, coding]
+ *         role:
+ *           type: string
+ *           enum: [user, admin]
+ *           example: user
  *         createdAt:
  *           type: string
  *           format: date-time
@@ -159,6 +163,10 @@
  *         token:
  *           type: string
  *           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *         role:
+ *           type: string
+ *           enum: [user, admin]
+ *           example: user
  *         user:
  *           $ref: '#/components/schemas/User'
  *

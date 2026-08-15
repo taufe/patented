@@ -41,6 +41,14 @@ const swaggerDefinition = {
       name: 'Authentication',
       description: 'User registration, login, and password reset',
     },
+    {
+      name: 'Admin Courses',
+      description: 'Admin course / chapter / video management',
+    },
+    {
+      name: 'User Courses',
+      description: 'Published courses, playback, and watch progress',
+    },
   ],
 };
 
@@ -49,6 +57,7 @@ const swaggerOptions = {
   apis: [
     path.join(__dirname, '../docs/swagger/schemas.js'),
     path.join(__dirname, '../docs/swagger/paths.js'),
+    path.join(__dirname, '../docs/swagger/coursePaths.js'),
   ],
 };
 

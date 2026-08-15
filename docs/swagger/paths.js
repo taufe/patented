@@ -144,7 +144,7 @@
  *     tags:
  *       - Authentication
  *     summary: Login user
- *     description: Authenticates a user with email and password. Returns a JWT token valid for 1 day and user data without the password.
+ *     description: Authenticates a user or admin with email and password. Returns a JWT (1 day) that includes id and role. Use user.role or the top-level role field to route Flutter to the User Dashboard or Admin Dashboard.
  *     requestBody:
  *       required: true
  *       content:
@@ -161,17 +161,37 @@
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/LoginSuccessResponse'
- *             example:
- *               success: true
- *               message: Login successful
- *               token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
- *               user:
- *                 _id: 665f1a2b3c4d5e6f7a8b9c0d
- *                 name: John Doe
- *                 email: john@example.com
- *                 hobbies: []
- *                 createdAt: 2026-07-02T12:00:00.000Z
- *                 updatedAt: 2026-07-02T12:00:00.000Z
+ *             examples:
+ *               userLogin:
+ *                 summary: User login
+ *                 value:
+ *                   success: true
+ *                   message: Login successful
+ *                   token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                   role: user
+ *                   user:
+ *                     _id: 665f1a2b3c4d5e6f7a8b9c0d
+ *                     name: Demo User
+ *                     email: user@patented.app
+ *                     hobbies: []
+ *                     role: user
+ *                     createdAt: 2026-07-02T12:00:00.000Z
+ *                     updatedAt: 2026-07-02T12:00:00.000Z
+ *               adminLogin:
+ *                 summary: Admin login
+ *                 value:
+ *                   success: true
+ *                   message: Login successful
+ *                   token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                   role: admin
+ *                   user:
+ *                     _id: 665f1a2b3c4d5e6f7a8b9c0e
+ *                     name: Demo Admin
+ *                     email: admin@patented.app
+ *                     hobbies: []
+ *                     role: admin
+ *                     createdAt: 2026-07-02T12:00:00.000Z
+ *                     updatedAt: 2026-07-02T12:00:00.000Z
  *       400:
  *         description: Missing email or password
  *         content:

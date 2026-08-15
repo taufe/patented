@@ -7,6 +7,8 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "mongo:direct-uri": "node scripts/print-direct-mongo-uri.js",
+    "seed:demo": "node scripts/seed-demo-accounts.js",
+    "seed:courses": "node scripts/seed-courses.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
