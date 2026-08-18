@@ -43,11 +43,11 @@ const swaggerDefinition = {
     },
     {
       name: 'Admin Courses',
-      description: 'Admin course / chapter / video management',
+      description: 'Admin course / chapter / video / PDF management',
     },
     {
       name: 'User Courses',
-      description: 'Published courses, playback, and watch progress',
+      description: 'Published courses, playback, PDFs, and watch progress',
     },
     {
       name: 'Profile',
@@ -86,6 +86,7 @@ const swaggerOptions = {
     path.join(__dirname, '../docs/swagger/schemas.js'),
     path.join(__dirname, '../docs/swagger/paths.js'),
     path.join(__dirname, '../docs/swagger/coursePaths.js'),
+    path.join(__dirname, '../docs/swagger/pdfPaths.js'),
     path.join(__dirname, '../docs/swagger/accountPaths.js'),
     path.join(__dirname, '../docs/swagger/paymentNotificationPaths.js'),
   ],

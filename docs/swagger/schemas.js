@@ -261,6 +261,44 @@
  *         message:
  *           type: string
  *           example: Password reset successfully. You can now log in with your new password.
+ *
+ *     PublicPdf:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         courseId:
+ *           type: string
+ *         chapterId:
+ *           type: string
+ *           nullable: true
+ *         videoId:
+ *           type: string
+ *           nullable: true
+ *         scope:
+ *           type: string
+ *           enum: [course, chapter, lecture]
+ *         kind:
+ *           type: string
+ *           enum: [book, vocabulary, notes, handout]
+ *         title:
+ *           type: string
+ *           example: Chapter 1 notes
+ *         originalFileName:
+ *           type: string
+ *           example: chapter-1.pdf
+ *         fileSize:
+ *           type: number
+ *           example: 248320
+ *         mimeType:
+ *           type: string
+ *           example: application/pdf
+ *         available:
+ *           type: boolean
+ *         downloadPath:
+ *           type: string
+ *           nullable: true
+ *           example: /api/courses/665f1a2b3c4d5e6f7a8b9c0d/pdfs/665f1a2b3c4d5e6f7a8b9c11/download
  */
 
 module.exports = {};

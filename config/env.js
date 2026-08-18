@@ -102,6 +102,18 @@ const getFirebaseCredentials = () => {
 
 const isFcmConfigured = () => Boolean(getFirebaseCredentials());
 
+const getPdfMaxFileMb = () => {
+  const parsed = Number(process.env.PDF_MAX_FILE_MB || 15);
+
+  if (!Number.isFinite(parsed) || parsed <= 0 || parsed > 50) {
+    return 15;
+  }
+
+  return parsed;
+};
+
+const getPdfMaxFileBytes = () => getPdfMaxFileMb() * 1024 * 1024;
+
 const logEnvDiagnostics = () => {
   const mongoUri = getMongoUri();
 
@@ -127,4 +139,6 @@ module.exports = {
   getVideoCompletionThreshold,
   getFirebaseCredentials,
   isFcmConfigured,
+  getPdfMaxFileMb,
+  getPdfMaxFileBytes,
 };

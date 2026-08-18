@@ -59,9 +59,39 @@ const isVideoLocked = (video, user, course) => {
   return false;
 };
 
+const isCourseContentLocked = (user, course) => {
+  if (!course || !course.isPremium) {
+    return false;
+  }
+
+  if (!user) {
+    return true;
+  }
+
+  if (user.role === 'admin' || hasActivePremium(user)) {
+    return false;
+  }
+
+  if (hasUnlockedCourse(user, course._id)) {
+    return false;
+  }
+
+  return true;
+};
+
+const isPdfLocked = (pdf, user, course, video = null) => {
+  if (pdf && pdf.scope === 'lecture' && video) {
+    return isVideoLocked(video, user, course);
+  }
+
+  return isCourseContentLocked(user, course);
+};
+
 module.exports = {
   hasActivePremium,
   userHasActiveSubscription,
   hasUnlockedCourse,
   isVideoLocked,
+  isCourseContentLocked,
+  isPdfLocked,
 };

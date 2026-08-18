@@ -23,6 +23,19 @@ const {
   deleteVideo,
   reorderVideos,
 } = require('../../controllers/admin/videoController');
+const {
+  listCoursePdfs,
+  createCoursePdf,
+  listChapterPdfs,
+  createChapterPdf,
+  listVideoPdfs,
+  createVideoPdf,
+  getPdf,
+  updatePdf,
+  deletePdf,
+  downloadPdf,
+} = require('../../controllers/admin/pdfController');
+const { uploadPdf } = require('../../middleware/uploadPdf');
 
 const router = express.Router();
 
@@ -49,5 +62,19 @@ router.post('/chapters/:chapterId/videos', createVideo);
 
 router.patch('/videos/:videoId', updateVideo);
 router.delete('/videos/:videoId', deleteVideo);
+
+router.get('/courses/:courseId/pdfs', listCoursePdfs);
+router.post('/courses/:courseId/pdfs', uploadPdf({ required: true }), createCoursePdf);
+
+router.get('/chapters/:chapterId/pdfs', listChapterPdfs);
+router.post('/chapters/:chapterId/pdfs', uploadPdf({ required: true }), createChapterPdf);
+
+router.get('/videos/:videoId/pdfs', listVideoPdfs);
+router.post('/videos/:videoId/pdfs', uploadPdf({ required: true }), createVideoPdf);
+
+router.get('/pdfs/:pdfId', getPdf);
+router.get('/pdfs/:pdfId/download', downloadPdf);
+router.patch('/pdfs/:pdfId', uploadPdf({ required: false }), updatePdf);
+router.delete('/pdfs/:pdfId', deletePdf);
 
 module.exports = router;

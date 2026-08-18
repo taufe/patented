@@ -1,4 +1,5 @@
 const COURSE_STATUSES = ['Draft', 'Published', 'Archived'];
+const PDF_KINDS = ['book', 'vocabulary', 'notes', 'handout'];
 const { PROVIDERS } = require('../services/videoStorage.service');
 const { toNumber } = require('./duration');
 
@@ -120,11 +121,44 @@ const validateOrderedIds = (orderedIds) => {
   return null;
 };
 
+const validatePdfPayload = (body = {}) => {
+  if (body.title !== undefined) {
+    const titleError = validateTitle(body.title, 'PDF title');
+    if (titleError) {
+      return titleError;
+    }
+  }
+
+  if (body.kind !== undefined && body.kind !== '' && !PDF_KINDS.includes(String(body.kind).trim())) {
+    return 'Kind must be book, vocabulary, notes, or handout';
+  }
+
+  if (body.order !== undefined && toNumber(body.order, -1) < 0) {
+    return 'Order must be 0 or greater';
+  }
+
+  return null;
+};
+
+const titleFromFileName = (originalFileName = '') => {
+  const base = String(originalFileName)
+    .replace(/\\/g, '/')
+    .split('/')
+    .pop()
+    .replace(/\.pdf$/i, '')
+    .trim();
+
+  return base || 'Learning material';
+};
+
 module.exports = {
   COURSE_STATUSES,
+  PDF_KINDS,
   asBoolean,
   validateCoursePayload,
   validateChapterPayload,
   validateVideoPayload,
   validateOrderedIds,
+  validatePdfPayload,
+  titleFromFileName,
 };

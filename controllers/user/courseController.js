@@ -2,11 +2,13 @@ const Course = require('../../models/Course');
 const Chapter = require('../../models/Chapter');
 const Video = require('../../models/Video');
 const VideoProgress = require('../../models/VideoProgress');
+const Pdf = require('../../models/Pdf');
 const { isValidId, invalidIdResponse } = require('../../utils/ids');
 const { formatDurationLabel } = require('../../utils/duration');
 const { getPagination, paginationMeta } = require('../../utils/pagination');
-const { isVideoLocked } = require('../../utils/subscription');
+const { isVideoLocked, isPdfLocked } = require('../../utils/subscription');
 const { toUserProgress } = require('../../utils/learningProgress');
+const { toPublicPdf } = require('../../utils/pdfResponse');
 
 const PUBLISHED_COURSE = { status: 'Published' };
 
@@ -58,6 +60,12 @@ const toPublicVideo = (video, { locked = false, progress = null } = {}) => {
     ...(locked ? { message: 'Premium subscription required' } : {}),
   };
 };
+
+const listPublishedPdfs = async (query) =>
+  Pdf.find({ ...query, published: true }).sort({ order: 1, createdAt: 1 });
+
+const toPublicPdfList = (pdfs, user, course, video = null) =>
+  pdfs.map((pdf) => toPublicPdf(pdf, { locked: isPdfLocked(pdf, user, course, video) }));
 
 const getPublishedChapterIds = async (courseId) => {
   const chapters = await Chapter.find({ courseId, published: true }).select('_id');
@@ -205,9 +213,10 @@ const getCourse = async (req, res) => {
     }
 
     const chapters = await Chapter.find({ courseId, published: true }).sort({ order: 1 });
-    const [stats, chapterSummaries] = await Promise.all([
+    const [stats, chapterSummaries, coursePdfs] = await Promise.all([
       getCourseLearningStats(req.user._id, courseId),
       getChapterSummaries(req.user._id, chapters),
+      listPublishedPdfs({ courseId, scope: 'course' }),
     ]);
 
     res.json({
@@ -219,6 +228,7 @@ const getCourse = async (req, res) => {
         totalVideos: stats.totalVideos,
       }),
       chapters: chapterSummaries,
+      pdfs: toPublicPdfList(coursePdfs, req.user, course),
     });
   } catch (error) {
     res.status(500).json({
@@ -294,14 +304,26 @@ const getChapter = async (req, res) => {
     }
 
     const videos = await Video.find({ chapterId, published: true }).sort({ order: 1 });
+    const videoIds = videos.map((video) => video._id);
 
-    const progressRows = await VideoProgress.find({
-      userId: req.user._id,
-      videoId: { $in: videos.map((video) => video._id) },
-    });
+    const [progressRows, chapterPdfs, lecturePdfs] = await Promise.all([
+      VideoProgress.find({
+        userId: req.user._id,
+        videoId: { $in: videoIds },
+      }),
+      listPublishedPdfs({ courseId, chapterId, scope: 'chapter' }),
+      listPublishedPdfs({ videoId: { $in: videoIds }, scope: 'lecture' }),
+    ]);
     const progressByVideo = new Map(
       progressRows.map((row) => [String(row.videoId), row])
     );
+    const pdfsByVideo = new Map();
+    lecturePdfs.forEach((pdf) => {
+      const key = String(pdf.videoId);
+      const list = pdfsByVideo.get(key) || [];
+      list.push(pdf);
+      pdfsByVideo.set(key, list);
+    });
     const completedVideos = progressRows.filter((row) => row.completed).length;
     const totalVideos = videos.length;
     const chapterProgress =
@@ -325,13 +347,18 @@ const getChapter = async (req, res) => {
         createdAt: chapterValue.createdAt,
         updatedAt: chapterValue.updatedAt,
       },
+      pdfs: toPublicPdfList(chapterPdfs, req.user, course),
       videos: videos.map((video) => {
         const locked = isVideoLocked(video, req.user, course);
         const row = progressByVideo.get(String(video._id));
-        return toPublicVideo(video, {
-          locked,
-          progress: toUserProgress(row),
-        });
+        const videoPdfs = pdfsByVideo.get(String(video._id)) || [];
+        return {
+          ...toPublicVideo(video, {
+            locked,
+            progress: toUserProgress(row),
+          }),
+          pdfs: toPublicPdfList(videoPdfs, req.user, course, video),
+        };
       }),
     });
   } catch (error) {
@@ -380,21 +407,29 @@ const getVideo = async (req, res) => {
 
     const locked = isVideoLocked(video, req.user, course);
 
+    const lecturePdfs = await listPublishedPdfs({ videoId, scope: 'lecture' });
+
     if (locked) {
       return res.status(403).json({
         success: false,
         message: 'Premium subscription required',
-        video: toPublicVideo(video, { locked: true }),
+        video: {
+          ...toPublicVideo(video, { locked: true }),
+          pdfs: toPublicPdfList(lecturePdfs, req.user, course, video),
+        },
       });
     }
 
     res.json({
       success: true,
       message: 'Video fetched successfully',
-      video: toPublicVideo(video, {
-        locked: false,
-        progress: toUserProgress(progressRow),
-      }),
+      video: {
+        ...toPublicVideo(video, {
+          locked: false,
+          progress: toUserProgress(progressRow),
+        }),
+        pdfs: toPublicPdfList(lecturePdfs, req.user, course, video),
+      },
     });
   } catch (error) {
     res.status(500).json({

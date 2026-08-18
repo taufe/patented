@@ -1,6 +1,7 @@
 const Chapter = require('../../models/Chapter');
 const Video = require('../../models/Video');
 const VideoProgress = require('../../models/VideoProgress');
+const { deletePdfsAndFiles } = require('../../services/pdfCleanup.service');
 const { isValidId, invalidIdResponse } = require('../../utils/ids');
 const { formatDurationLabel, toNumber } = require('../../utils/duration');
 const { recountChapter, recountCourse } = require('../../services/contentCounters');
@@ -261,6 +262,7 @@ const deleteVideo = async (req, res) => {
 
     await Promise.all([
       VideoProgress.deleteMany({ videoId }),
+      deletePdfsAndFiles({ videoId }),
       Video.deleteOne({ _id: videoId }),
     ]);
 

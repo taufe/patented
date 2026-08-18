@@ -2,6 +2,7 @@ const Course = require('../../models/Course');
 const Chapter = require('../../models/Chapter');
 const Video = require('../../models/Video');
 const VideoProgress = require('../../models/VideoProgress');
+const { deletePdfsAndFiles } = require('../../services/pdfCleanup.service');
 const { isValidId, invalidIdResponse } = require('../../utils/ids');
 const { toNumber } = require('../../utils/duration');
 const { getPagination, paginationMeta } = require('../../utils/pagination');
@@ -226,6 +227,7 @@ const deleteCourse = async (req, res) => {
       VideoProgress.deleteMany({ $or: [{ courseId }, { videoId: { $in: videoIds } }] }),
       Video.deleteMany({ courseId }),
       Chapter.deleteMany({ courseId }),
+      deletePdfsAndFiles({ courseId }),
       Course.deleteOne({ _id: courseId }),
     ]);
 
