@@ -3,6 +3,7 @@ const Course = require('../../models/Course');
 const Chapter = require('../../models/Chapter');
 const Video = require('../../models/Video');
 const VideoProgress = require('../../models/VideoProgress');
+const Payment = require('../../models/Payment');
 const { toPublicUser } = require('../../utils/userResponse');
 const { formatTimeAgo, startOfTodayUtc, daysAgo } = require('../../utils/relativeTime');
 
@@ -92,6 +93,7 @@ const getDashboard = async (req, res) => {
       progressTotal,
       progressCompleted,
       completedCourses,
+      pendingPayments,
     ] = await Promise.all([
       User.countDocuments({ role: 'user' }),
       Course.countDocuments(),
@@ -107,6 +109,7 @@ const getDashboard = async (req, res) => {
       VideoProgress.countDocuments(),
       VideoProgress.countDocuments({ completed: true }),
       countCourseCompletions(),
+      Payment.countDocuments({ status: 'pending' }),
     ]);
 
     const activeStudentIds = new Set(activeFromProgress.map(String));
@@ -165,6 +168,7 @@ const getDashboard = async (req, res) => {
         { key: 'courses', title: 'Courses', value: courses },
         { key: 'activeStudents', title: 'Active Students', value: activeStudents },
         { key: 'certificates', title: 'Certificates', value: 0 },
+        { key: 'pendingPayments', title: 'Pending Payments', value: pendingPayments },
       ],
       platformStats: [
         { key: 'todayUsers', title: "Today's Users", value: todayUsers },
@@ -175,7 +179,8 @@ const getDashboard = async (req, res) => {
       recentUsers,
       recentCourses,
       recentActivities,
-      notificationCount: recentActivities.length,
+      pendingPaymentCount: pendingPayments,
+      notificationCount: pendingPayments,
     });
   } catch (error) {
     res.status(500).json({

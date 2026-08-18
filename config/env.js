@@ -62,6 +62,46 @@ const getVideoCompletionThreshold = () => {
   return parsed;
 };
 
+const getFirebaseProjectId = () => (process.env.FIREBASE_PROJECT_ID || '').trim();
+
+const getFirebaseClientEmail = () => (process.env.FIREBASE_CLIENT_EMAIL || '').trim();
+
+const getFirebasePrivateKey = () =>
+  (process.env.FIREBASE_PRIVATE_KEY || '').trim().replace(/\\n/g, '\n');
+
+const getFirebaseServiceAccountJson = () => (process.env.FIREBASE_SERVICE_ACCOUNT_JSON || '').trim();
+
+const getFirebaseCredentials = () => {
+  const rawJson = getFirebaseServiceAccountJson();
+
+  if (rawJson) {
+    try {
+      const parsed = JSON.parse(rawJson);
+      if (parsed.project_id && parsed.client_email && parsed.private_key) {
+        return {
+          projectId: parsed.project_id,
+          clientEmail: parsed.client_email,
+          privateKey: String(parsed.private_key).replace(/\\n/g, '\n'),
+        };
+      }
+    } catch (error) {
+      return null;
+    }
+  }
+
+  const projectId = getFirebaseProjectId();
+  const clientEmail = getFirebaseClientEmail();
+  const privateKey = getFirebasePrivateKey();
+
+  if (!projectId || !clientEmail || !privateKey) {
+    return null;
+  }
+
+  return { projectId, clientEmail, privateKey };
+};
+
+const isFcmConfigured = () => Boolean(getFirebaseCredentials());
+
 const logEnvDiagnostics = () => {
   const mongoUri = getMongoUri();
 
@@ -85,4 +125,6 @@ module.exports = {
   isVercel,
   logEnvDiagnostics,
   getVideoCompletionThreshold,
+  getFirebaseCredentials,
+  isFcmConfigured,
 };

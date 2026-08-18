@@ -5,8 +5,11 @@ const authRoutes = require('./routes/authRoutes');
 const adminCourseRoutes = require('./routes/admin/courseRoutes');
 const adminDashboardRoutes = require('./routes/admin/dashboardRoutes');
 const adminUserRoutes = require('./routes/admin/userRoutes');
+const adminPaymentRoutes = require('./routes/admin/paymentRoutes');
+const adminNotificationRoutes = require('./routes/admin/notificationRoutes');
 const userCourseRoutes = require('./routes/user/courseRoutes');
 const meRoutes = require('./routes/user/meRoutes');
+const userPaymentRoutes = require('./routes/user/paymentRoutes');
 const { mountSwagger } = require('./config/swagger');
 const {
   getMongoUri,
@@ -132,7 +135,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminDashboardRoutes);
 app.use('/api/admin', adminUserRoutes);
 app.use('/api/admin', adminCourseRoutes);
+app.use('/api/admin', adminPaymentRoutes);
+app.use('/api/admin', adminNotificationRoutes);
 app.use('/api', meRoutes);
+app.use('/api', userPaymentRoutes);
 app.use('/api', userCourseRoutes);
 
 module.exports = app;

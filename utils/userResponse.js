@@ -1,3 +1,5 @@
+const { hasActivePremium } = require('./subscription');
+
 const toPublicUser = (user) => {
   const userResponse = user.toObject({ virtuals: false });
 
@@ -9,7 +11,10 @@ const toPublicUser = (user) => {
   delete userResponse.resetPasswordTokenExpires;
 
   userResponse.role = userResponse.role === 'admin' ? 'admin' : 'user';
-  userResponse.isPremium = Boolean(userResponse.isPremium);
+  userResponse.isPremium =
+    userResponse.role === 'admin' ? Boolean(user.isPremium) : hasActivePremium(user);
+  userResponse.premiumPlan = userResponse.premiumPlan || '';
+  userResponse.premiumExpiresAt = userResponse.premiumExpiresAt || null;
   userResponse.isBlocked = Boolean(userResponse.isBlocked);
   userResponse.emailVerified = Boolean(userResponse.emailVerified);
   userResponse.phone = userResponse.phone || '';

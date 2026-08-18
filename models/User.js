@@ -28,6 +28,15 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    premiumPlan: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    premiumExpiresAt: {
+      type: Date,
+      default: null,
+    },
     age: {
       type: Number,
       min: 0,

@@ -61,6 +61,22 @@ const swaggerDefinition = {
       name: 'Admin Users',
       description: 'Admin user management and course unlock',
     },
+    {
+      name: 'Payments',
+      description: 'Subscription plans and manual payment submission',
+    },
+    {
+      name: 'Admin Payments',
+      description: 'Admin review of manual payments',
+    },
+    {
+      name: 'Notifications',
+      description: 'Device tokens and in-app notifications',
+    },
+    {
+      name: 'Admin Notifications',
+      description: 'Admin push / in-app notification send',
+    },
   ],
 };
 
@@ -71,6 +87,7 @@ const swaggerOptions = {
     path.join(__dirname, '../docs/swagger/paths.js'),
     path.join(__dirname, '../docs/swagger/coursePaths.js'),
     path.join(__dirname, '../docs/swagger/accountPaths.js'),
+    path.join(__dirname, '../docs/swagger/paymentNotificationPaths.js'),
   ],
 };
 

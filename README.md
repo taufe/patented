@@ -179,3 +179,75 @@ npm run seed:courses
 ```
 
 `seed:courses` upserts **Driving License Type B** from `data/SEED_DRIVING_LICENSE_TYPE_B.json` (25 published chapters, 117 Vimeo lectures). The first two lectures in each chapter are free; the rest are premium. The old stub course `Road Safety & Traffic Rules` is removed.
+
+## Manual payments
+
+Premium is **not** granted when a user submits a payment. Status stays `pending` until an admin approves it. Approve sets `user.isPremium = true` and `premiumExpiresAt` (Weekly 7 days, Monthly 30 days, Yearly 365 days). Reject leaves premium unchanged.
+
+Account numbers come from env (`JAZZCASH_ACCOUNT`, `EASYPAISA_ACCOUNT`, `BANK_ACCOUNT`, …). Placeholders are returned if unset.
+
+```bash
+# Plans + method instructions
+curl http://localhost:5001/api/subscription/plans -H "Authorization: Bearer $TOKEN"
+curl http://localhost:5001/api/payments/methods -H "Authorization: Bearer $TOKEN"
+
+# Submit (user)
+curl -X POST http://localhost:5001/api/payments/manual \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "plan": "Monthly",
+    "amount": 2000,
+    "currency": "PKR",
+    "method": "JazzCash",
+    "transactionId": "JZ123456",
+    "senderPhone": "03001234567",
+    "proofUrl": "",
+    "note": ""
+  }'
+
+curl "http://localhost:5001/api/payments/my?page=1" -H "Authorization: Bearer $TOKEN"
+
+# Admin review
+curl "http://localhost:5001/api/admin/payments?status=pending" \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+
+curl -X PATCH http://localhost:5001/api/admin/payments/PAYMENT_ID/review \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"status":"approved","note":"Verified"}'
+```
+
+## Push notifications
+
+Register the FCM token after login. Unregister on logout. Admin send writes an in-app inbox row per recipient and attempts FCM if Firebase Admin credentials are set. Users with `pushNotification: false` still get the in-app row; FCM is skipped for them.
+
+```bash
+curl -X POST http://localhost:5001/api/me/device-token \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"token":"FCM_TOKEN","platform":"android","device":"Pixel"}'
+
+curl "http://localhost:5001/api/me/notifications?page=1&limit=20" \
+  -H "Authorization: Bearer $TOKEN"
+
+curl -X PATCH http://localhost:5001/api/me/notifications/NOTIFICATION_ID/read \
+  -H "Authorization: Bearer $TOKEN"
+
+curl -X DELETE http://localhost:5001/api/me/device-token \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"token":"FCM_TOKEN"}'
+
+curl -X POST http://localhost:5001/api/admin/notifications/send \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "New lecture published",
+    "body": "Chapter 2 is now available",
+    "audience": "all",
+    "data": { "type": "course", "courseId": "COURSE_ID" }
+  }'
+```
+
+FCM env (optional until push is needed): `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`, or a single `FIREBASE_SERVICE_ACCOUNT_JSON`.

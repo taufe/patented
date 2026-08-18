@@ -1,4 +1,4 @@
-const userHasActiveSubscription = async (user) => {
+const hasActivePremium = (user) => {
   if (!user) {
     return false;
   }
@@ -7,8 +7,18 @@ const userHasActiveSubscription = async (user) => {
     return true;
   }
 
-  return Boolean(user.isPremium);
+  if (!user.isPremium) {
+    return false;
+  }
+
+  if (user.premiumExpiresAt && new Date(user.premiumExpiresAt).getTime() <= Date.now()) {
+    return false;
+  }
+
+  return true;
 };
+
+const userHasActiveSubscription = async (user) => hasActivePremium(user);
 
 const hasUnlockedCourse = (user, courseId) => {
   if (!user || !courseId || !Array.isArray(user.unlockedCourses)) {
@@ -30,7 +40,7 @@ const isVideoLocked = (video, user, course) => {
     return Boolean(video.isPremium || (course && course.isPremium));
   }
 
-  if (user.role === 'admin' || user.isPremium) {
+  if (user.role === 'admin' || hasActivePremium(user)) {
     return false;
   }
 
@@ -50,6 +60,7 @@ const isVideoLocked = (video, user, course) => {
 };
 
 module.exports = {
+  hasActivePremium,
   userHasActiveSubscription,
   hasUnlockedCourse,
   isVideoLocked,
