@@ -5,6 +5,7 @@ const { isValidId, invalidIdResponse } = require('../../utils/ids');
 const { toPublicUser } = require('../../utils/userResponse');
 const { asBoolean } = require('../../utils/courseValidation');
 const { getPagination, paginationMeta } = require('../../utils/pagination');
+const { deleteProfilePhotos } = require('../../services/photoStorage.service');
 
 const getUserOr404 = async (res, userId) => {
   if (!isValidId(userId)) {
@@ -200,6 +201,7 @@ const deleteUser = async (req, res) => {
     }
 
     await VideoProgress.deleteMany({ userId: user._id });
+    await deleteProfilePhotos(user._id);
     await User.deleteOne({ _id: user._id });
 
     res.json({

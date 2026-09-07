@@ -36,6 +36,9 @@
  *           type: string
  *           format: date-time
  *           example: 2026-07-02T12:00:00.000Z
+ *         photoUrl:
+ *           type: string
+ *           example: https://patented.vercel.app/api/public/photos/665f1a2b3c4d5e6f7a8b9c0d
  *
  *     RegisterRequest:
  *       type: object

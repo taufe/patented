@@ -114,6 +114,43 @@ const getPdfMaxFileMb = () => {
 
 const getPdfMaxFileBytes = () => getPdfMaxFileMb() * 1024 * 1024;
 
+const PHOTO_MAX_FILE_MB = 5;
+
+const getPhotoMaxFileMb = () => PHOTO_MAX_FILE_MB;
+
+const getPhotoMaxFileBytes = () => getPhotoMaxFileMb() * 1024 * 1024;
+
+const getPublicBaseUrl = (req) => {
+  const configured = stripQuotes(process.env.PUBLIC_BASE_URL || '').replace(/\/$/, '');
+
+  if (configured) {
+    return configured;
+  }
+
+  if (req) {
+    const host = String(req.get('x-forwarded-host') || req.get('host') || '')
+      .split(',')[0]
+      .trim();
+
+    if (host) {
+      const forwardedProto = String(req.get('x-forwarded-proto') || '')
+        .split(',')[0]
+        .trim();
+      const proto = isVercel
+        ? 'https'
+        : forwardedProto || (/vercel\.app$/i.test(host) ? 'https' : req.protocol || 'http');
+
+      return `${proto}://${host}`;
+    }
+  }
+
+  if (process.env.VERCEL_URL) {
+    return `https://${String(process.env.VERCEL_URL).replace(/^https?:\/\//, '')}`;
+  }
+
+  return `http://localhost:${process.env.PORT || 5001}`;
+};
+
 const logEnvDiagnostics = () => {
   const mongoUri = getMongoUri();
 
@@ -141,4 +178,7 @@ module.exports = {
   isFcmConfigured,
   getPdfMaxFileMb,
   getPdfMaxFileBytes,
+  getPhotoMaxFileMb,
+  getPhotoMaxFileBytes,
+  getPublicBaseUrl,
 };

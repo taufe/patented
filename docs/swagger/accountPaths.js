@@ -12,9 +12,70 @@
  *     tags: [Profile]
  *     summary: Update current profile
  *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name: { type: string }
+ *               phone: { type: string }
+ *               country: { type: string }
+ *               dateOfBirth: { type: string }
+ *               department: { type: string }
+ *               designation: { type: string }
+ *               about: { type: string }
+ *               photoUrl: { type: string, description: Optional public HTTPS image URL }
  *     responses:
  *       200:
  *         description: Profile updated
+ *
+ * /api/me/photo:
+ *   post:
+ *     tags: [Profile]
+ *     summary: Upload current user's profile photo
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               photo: { type: string, format: binary }
+ *               file: { type: string, format: binary }
+ *               image: { type: string, format: binary }
+ *     responses:
+ *       200:
+ *         description: Profile photo updated
+ *       400:
+ *         description: Missing, invalid, or oversized image
+ *       401:
+ *         description: Missing or invalid token
+ *       403:
+ *         description: Account blocked
+ *   delete:
+ *     tags: [Profile]
+ *     summary: Remove current user's profile photo
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Profile photo removed
+ *
+ * /api/public/photos/{userId}:
+ *   get:
+ *     tags: [Profile]
+ *     summary: Public profile photo file
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Image bytes
+ *       404:
+ *         description: Photo not found
  *
  * /api/auth/change-password:
  *   patch:
