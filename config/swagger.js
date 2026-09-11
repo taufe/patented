@@ -77,6 +77,14 @@ const swaggerDefinition = {
       name: 'Admin Notifications',
       description: 'Admin push / in-app notification send',
     },
+    {
+      name: 'Contact',
+      description: 'Public WhatsApp, phone, and email for the app',
+    },
+    {
+      name: 'Admin Contact',
+      description: 'Admin contact settings used by Admin → Contact',
+    },
   ],
 };
 
@@ -89,6 +97,7 @@ const swaggerOptions = {
     path.join(__dirname, '../docs/swagger/pdfPaths.js'),
     path.join(__dirname, '../docs/swagger/accountPaths.js'),
     path.join(__dirname, '../docs/swagger/paymentNotificationPaths.js'),
+    path.join(__dirname, '../docs/swagger/contactPaths.js'),
   ],
 };
 

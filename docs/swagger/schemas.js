@@ -265,6 +265,55 @@
  *           type: string
  *           example: Password reset successfully. You can now log in with your new password.
  *
+ *     Contact:
+ *       type: object
+ *       properties:
+ *         whatsapp:
+ *           type: string
+ *           example: '03159464767'
+ *         phone:
+ *           type: string
+ *           example: '03159464767'
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: Sajidkhan56564@gmail.com
+ *
+ *     ContactResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         contact:
+ *           $ref: '#/components/schemas/Contact'
+ *
+ *     AdminContactResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: Contact settings fetched successfully
+ *         contact:
+ *           $ref: '#/components/schemas/Contact'
+ *
+ *     ContactUpdateRequest:
+ *       type: object
+ *       properties:
+ *         whatsapp:
+ *           type: string
+ *           example: '03159464767'
+ *         phone:
+ *           type: string
+ *           example: '03159464767'
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: Sajidkhan56564@gmail.com
+ *
  *     PublicPdf:
  *       type: object
  *       properties:

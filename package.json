@@ -9,6 +9,7 @@
     "mongo:direct-uri": "node scripts/print-direct-mongo-uri.js",
     "seed:demo": "node scripts/seed-demo-accounts.js",
     "seed:courses": "node scripts/seed-courses.js",
+    "seed:contact": "node scripts/seed-contact.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
