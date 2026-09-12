@@ -35,19 +35,19 @@ const getMongoClusterHost = () => {
 
 const getJwtSecret = () => (process.env.JWT_SECRET || '').trim();
 
-const getSmtpHost = () => (process.env.SMTP_HOST || '').trim();
+const getSmtpHost = () => stripQuotes(process.env.SMTP_HOST || '');
 
 const getSmtpPort = () => {
-  const port = Number(process.env.SMTP_PORT || 587);
+  const port = Number(stripQuotes(process.env.SMTP_PORT || '') || 587);
   return Number.isFinite(port) && port > 0 ? port : 587;
 };
 
-const getSmtpUser = () => (process.env.SMTP_USER || '').trim();
+const getSmtpUser = () => stripQuotes(process.env.SMTP_USER || '');
 
-const getSmtpPass = () => (process.env.SMTP_PASS || '').trim();
+const getSmtpPass = () => stripQuotes(process.env.SMTP_PASS || '').replace(/\s+/g, '');
 
 const getSmtpFrom = () =>
-  (process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@patented.app').trim();
+  stripQuotes(process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@patented.app');
 
 const isEmailConfigured = () =>
   Boolean(getSmtpHost() && getSmtpUser() && getSmtpPass());

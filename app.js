@@ -17,6 +17,7 @@ const {
   getMongoUri,
   getMongoClusterHost,
   getJwtSecret,
+  isEmailConfigured,
   logEnvDiagnostics,
 } = require('./config/env');
 
@@ -40,6 +41,7 @@ app.get('/api/health', (req, res) => {
     env: {
       mongoUri: Boolean(mongoUri),
       jwtSecret: Boolean(getJwtSecret()),
+      emailConfigured: isEmailConfigured(),
       nodeEnv: process.env.NODE_ENV,
       vercel: Boolean(process.env.VERCEL),
       mongoUriLength: mongoUri.length,

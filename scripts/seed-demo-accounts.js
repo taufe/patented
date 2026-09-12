@@ -15,7 +15,7 @@ const DEMO_ACCOUNTS = [
   },
   {
     name: 'Demo Admin',
-    email: 'admin@patented.app',
+    email: 'sajidkhan56564@gmail.com',
     password: 'Admin@123',
     role: 'admin',
   },
@@ -37,9 +37,23 @@ const seed = async () => {
   await connectDB();
 
   for (const account of DEMO_ACCOUNTS) {
+    const existing =
+      account.role === 'admin'
+        ? (await User.findOne({ email: account.email })) ||
+          (await User.findOne({ email: 'admin@patented.app' })) ||
+          (await User.findOne({ role: 'admin' }))
+        : await User.findOne({ email: account.email });
+
+    if (existing && account.role === 'admin') {
+      existing.email = account.email;
+      existing.role = 'admin';
+      await existing.save();
+      console.log(`Updated admin email: ${account.email}`);
+      continue;
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(account.password, salt);
-    const existing = await User.findOne({ email: account.email });
 
     if (existing) {
       existing.name = account.name;
