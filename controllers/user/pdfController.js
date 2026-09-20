@@ -4,7 +4,7 @@ const Video = require('../../models/Video');
 const Pdf = require('../../models/Pdf');
 const { isValidId, invalidIdResponse } = require('../../utils/ids');
 const { toPublicPdf, contentDisposition } = require('../../utils/pdfResponse');
-const { isPdfLocked } = require('../../utils/subscription');
+const { isPdfLocked, VIDEO_LOCK_MESSAGE } = require('../../utils/subscription');
 const { openPdfDownloadStream } = require('../../services/pdfStorage.service');
 
 const PUBLISHED_COURSE = { status: 'Published' };
@@ -91,7 +91,10 @@ const loadPublishedVideo = async (videoId) => {
 const forbiddenPdf = (res, pdf, locked) =>
   res.status(403).json({
     success: false,
-    message: 'Premium subscription required',
+    message:
+      pdf && pdf.scope === 'lecture'
+        ? VIDEO_LOCK_MESSAGE
+        : 'Premium subscription required',
     pdf: toPublicPdf(pdf, { locked }),
   });
 

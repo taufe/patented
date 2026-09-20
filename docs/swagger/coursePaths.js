@@ -260,6 +260,20 @@
  *       200:
  *         description: Course fetched
  *
+ * /api/courses/{courseId}/videos:
+ *   get:
+ *     tags: [User Courses]
+ *     summary: Published course videos (manual unlock lock applied)
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: courseId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Videos fetched
+ *
  * /api/courses/{courseId}/chapters:
  *   get:
  *     tags: [User Courses]
@@ -277,7 +291,7 @@
  * /api/courses/{courseId}/chapters/{chapterId}:
  *   get:
  *     tags: [User Courses]
- *     summary: Chapter + published videos (premium lock applied)
+ *     summary: Chapter + published videos (manual unlock lock applied)
  *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - in: path
@@ -306,7 +320,23 @@
  *       200:
  *         description: Video fetched
  *       403:
- *         description: Premium subscription required
+ *         description: Lecture locked until an admin unlocks it
+ *
+ * /api/videos/{videoId}/download:
+ *   get:
+ *     tags: [User Courses]
+ *     summary: Video playback URL (locked videos omit videoUrl)
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: videoId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Video download ready
+ *       403:
+ *         description: Lecture locked until an admin unlocks it
  *
  * /api/videos/{videoId}/progress:
  *   get:

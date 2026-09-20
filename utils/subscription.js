@@ -1,3 +1,6 @@
+const VIDEO_LOCK_MESSAGE =
+  'This lecture is locked. Contact the administrator after a manual payment.';
+
 const hasActivePremium = (user) => {
   if (!user) {
     return false;
@@ -20,27 +23,48 @@ const hasActivePremium = (user) => {
 
 const userHasActiveSubscription = async (user) => hasActivePremium(user);
 
+const toRefId = (item) => {
+  if (!item) {
+    return '';
+  }
+
+  return String(item._id ? item._id : item);
+};
+
 const hasUnlockedCourse = (user, courseId) => {
   if (!user || !courseId || !Array.isArray(user.unlockedCourses)) {
     return false;
   }
 
-  return user.unlockedCourses.some((item) => {
-    const id = item && item._id ? item._id : item;
-    return String(id) === String(courseId);
-  });
+  return user.unlockedCourses.some((item) => toRefId(item) === String(courseId));
 };
 
-const isVideoLocked = (video, user, course) => {
-  if (video.isFree) {
+const hasUnlockedVideo = (user, videoId) => {
+  if (!user || !videoId || !Array.isArray(user.unlockedVideos)) {
+    return false;
+  }
+
+  return user.unlockedVideos.some((item) => toRefId(item) === String(videoId));
+};
+
+const isVideoLocked = (video, user) => {
+  if (!video) {
+    return true;
+  }
+
+  if (video.isFree === true) {
     return false;
   }
 
   if (!user) {
-    return Boolean(video.isPremium || (course && course.isPremium));
+    return true;
   }
 
-  if (user.role === 'admin' || hasActivePremium(user)) {
+  if (user.role === 'admin') {
+    return false;
+  }
+
+  if (hasUnlockedVideo(user, video._id)) {
     return false;
   }
 
@@ -48,15 +72,7 @@ const isVideoLocked = (video, user, course) => {
     return false;
   }
 
-  if (video.isPremium) {
-    return true;
-  }
-
-  if (course && course.isPremium) {
-    return true;
-  }
-
-  return false;
+  return true;
 };
 
 const isCourseContentLocked = (user, course) => {
@@ -68,7 +84,7 @@ const isCourseContentLocked = (user, course) => {
     return true;
   }
 
-  if (user.role === 'admin' || hasActivePremium(user)) {
+  if (user.role === 'admin') {
     return false;
   }
 
@@ -81,16 +97,18 @@ const isCourseContentLocked = (user, course) => {
 
 const isPdfLocked = (pdf, user, course, video = null) => {
   if (pdf && pdf.scope === 'lecture' && video) {
-    return isVideoLocked(video, user, course);
+    return isVideoLocked(video, user);
   }
 
   return isCourseContentLocked(user, course);
 };
 
 module.exports = {
+  VIDEO_LOCK_MESSAGE,
   hasActivePremium,
   userHasActiveSubscription,
   hasUnlockedCourse,
+  hasUnlockedVideo,
   isVideoLocked,
   isCourseContentLocked,
   isPdfLocked,

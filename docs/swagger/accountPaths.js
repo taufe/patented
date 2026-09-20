@@ -201,6 +201,34 @@
  *       200:
  *         description: Course access updated
  *
+ * /api/admin/users/{userId}/video-access:
+ *   patch:
+ *     tags: [Admin Users]
+ *     summary: Unlock or lock a single video for a user
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [videoId, unlocked]
+ *             properties:
+ *               videoId: { type: string }
+ *               unlocked: { type: boolean }
+ *     responses:
+ *       200:
+ *         description: Video access updated
+ *       400:
+ *         description: Missing videoId or unlocked
+ *       404:
+ *         description: User or video not found
+ *
  * /api/admin/courses/options:
  *   get:
  *     tags: [Admin Users]

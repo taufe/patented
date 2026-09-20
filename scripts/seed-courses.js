@@ -10,6 +10,7 @@ const VideoProgress = require('../models/VideoProgress');
 const connectDB = require('../config/db');
 const { recountChapter, recountCourse } = require('../services/contentCounters');
 const { formatDurationLabel, parseDurationLabel } = require('../utils/duration');
+const { isChapter4, applyAllChapter4Previews } = require('../utils/chapter4Preview');
 const seedData = require('../data/SEED_DRIVING_LICENSE_TYPE_B.json');
 
 const STUB_COURSE_TITLES = ['Road Safety & Traffic Rules'];
@@ -76,7 +77,7 @@ const seedTypeB = async (admin) => {
     });
 
     const videos = (chapterSpec.videos || []).map((videoSpec, lectureIndex) => {
-      const isFree = lectureIndex < 2;
+      const isFree = isChapter4(chapterSpec) ? lectureIndex === 0 : lectureIndex < 2;
       const durationSeconds = parseDurationLabel(
         videoSpec.durationLabel,
         videoSpec.durationSeconds
@@ -112,6 +113,7 @@ const seedTypeB = async (admin) => {
   }
 
   await recountCourse(course._id);
+  await applyAllChapter4Previews();
   console.log(`Seeded ${chapters.length} chapters and ${videoCount} videos`);
 };
 

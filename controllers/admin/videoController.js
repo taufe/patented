@@ -1,5 +1,6 @@
 const Chapter = require('../../models/Chapter');
 const Video = require('../../models/Video');
+const User = require('../../models/User');
 const VideoProgress = require('../../models/VideoProgress');
 const { deletePdfsAndFiles } = require('../../services/pdfCleanup.service');
 const { isValidId, invalidIdResponse } = require('../../utils/ids');
@@ -14,6 +15,7 @@ const {
   validateVideoPayload,
   validateOrderedIds,
 } = require('../../utils/courseValidation');
+const { isChapter4, applyChapter4Preview } = require('../../utils/chapter4Preview');
 
 const nextVideoOrder = async (chapterId) => {
   const last = await Video.findOne({ chapterId }).sort({ order: -1 }).select('order');
@@ -179,7 +181,12 @@ const createVideo = async (req, res) => {
     payload.order =
       payload.order === undefined ? await nextVideoOrder(chapterId) : payload.order;
 
-    const video = await Video.create(payload);
+    let video = await Video.create(payload);
+
+    if (isChapter4(chapter)) {
+      await applyChapter4Preview(chapter);
+      video = await Video.findById(video._id);
+    }
 
     await Promise.all([recountChapter(chapterId), recountCourse(chapter.courseId)]);
 
@@ -262,9 +269,16 @@ const deleteVideo = async (req, res) => {
 
     await Promise.all([
       VideoProgress.deleteMany({ videoId }),
+      User.updateMany({ unlockedVideos: videoId }, { $pull: { unlockedVideos: videoId } }),
       deletePdfsAndFiles({ videoId }),
       Video.deleteOne({ _id: videoId }),
     ]);
+
+    const chapter = await Chapter.findById(video.chapterId);
+
+    if (chapter && isChapter4(chapter)) {
+      await applyChapter4Preview(chapter);
+    }
 
     await Promise.all([recountChapter(video.chapterId), recountCourse(video.courseId)]);
 
@@ -305,9 +319,9 @@ const reorderVideos = async (req, res) => {
       return invalidIdResponse(res, 'video ID');
     }
 
-    const videos = await Video.find({ _id: { $in: uniqueIds }, chapterId });
+    const matchingVideos = await Video.find({ _id: { $in: uniqueIds }, chapterId });
 
-    if (videos.length !== uniqueIds.length) {
+    if (matchingVideos.length !== uniqueIds.length) {
       return res.status(400).json({
         success: false,
         message: 'orderedIds must all belong to this chapter',
@@ -318,12 +332,18 @@ const reorderVideos = async (req, res) => {
       uniqueIds.map((id, index) => Video.findByIdAndUpdate(id, { order: index }))
     );
 
-    const updated = await Video.find({ chapterId }).sort({ order: 1 });
+    const chapter = await Chapter.findById(chapterId);
+
+    if (chapter && isChapter4(chapter)) {
+      await applyChapter4Preview(chapter);
+    }
+
+    const videos = await Video.find({ chapterId }).sort({ order: 1 });
 
     res.json({
       success: true,
       message: 'Videos reordered successfully',
-      videos: updated,
+      videos,
     });
   } catch (error) {
     res.status(500).json({

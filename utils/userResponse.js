@@ -1,5 +1,10 @@
 const { hasActivePremium } = require('./subscription');
 
+const toIdList = (items) =>
+  (Array.isArray(items) ? items : []).map((item) =>
+    item && item._id ? String(item._id) : String(item)
+  );
+
 const toPublicUser = (user) => {
   const userResponse = user.toObject({ virtuals: false });
 
@@ -26,9 +31,8 @@ const toPublicUser = (user) => {
   userResponse.photoUrl = userResponse.photoUrl || '';
   userResponse.lastDevice = userResponse.lastDevice || '';
   userResponse.hobbies = userResponse.hobbies || [];
-  userResponse.unlockedCourses = Array.isArray(userResponse.unlockedCourses)
-    ? userResponse.unlockedCourses
-    : [];
+  userResponse.unlockedCourses = toIdList(userResponse.unlockedCourses);
+  userResponse.unlockedVideos = toIdList(userResponse.unlockedVideos);
   userResponse.emailNotification = userResponse.emailNotification !== false;
   userResponse.pushNotification = userResponse.pushNotification !== false;
   userResponse.marketingEmails = Boolean(userResponse.marketingEmails);

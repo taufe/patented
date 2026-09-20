@@ -28,6 +28,16 @@
  *           type: string
  *           enum: [user, admin]
  *           example: user
+ *         unlockedCourses:
+ *           type: array
+ *           items:
+ *             type: string
+ *           example: [665f1a2b3c4d5e6f7a8b9c0d]
+ *         unlockedVideos:
+ *           type: array
+ *           items:
+ *             type: string
+ *           example: [665f1a2b3c4d5e6f7a8b9c11]
  *         createdAt:
  *           type: string
  *           format: date-time

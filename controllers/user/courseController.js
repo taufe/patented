@@ -6,7 +6,7 @@ const Pdf = require('../../models/Pdf');
 const { isValidId, invalidIdResponse } = require('../../utils/ids');
 const { formatDurationLabel } = require('../../utils/duration');
 const { getPagination, paginationMeta } = require('../../utils/pagination');
-const { isVideoLocked, isPdfLocked } = require('../../utils/subscription');
+const { isVideoLocked, isPdfLocked, VIDEO_LOCK_MESSAGE } = require('../../utils/subscription');
 const { toUserProgress } = require('../../utils/learningProgress');
 const { toPublicPdf } = require('../../utils/pdfResponse');
 
@@ -37,6 +37,7 @@ const toPublicCourse = (course, extra = {}) => {
 
 const toPublicVideo = (video, { locked = false, progress = null } = {}) => {
   const value = video.toObject ? video.toObject() : { ...video };
+  const durationLabel = value.durationLabel || formatDurationLabel(value.durationSeconds);
 
   return {
     _id: value._id,
@@ -45,8 +46,9 @@ const toPublicVideo = (video, { locked = false, progress = null } = {}) => {
     title: value.title,
     description: value.description,
     thumbnailUrl: value.thumbnailUrl,
+    duration: durationLabel || value.durationSeconds,
     durationSeconds: value.durationSeconds,
-    durationLabel: value.durationLabel || formatDurationLabel(value.durationSeconds),
+    durationLabel,
     published: value.published,
     isPremium: value.isPremium,
     isFree: value.isFree,
@@ -57,7 +59,12 @@ const toPublicVideo = (video, { locked = false, progress = null } = {}) => {
     videoUrl: locked ? null : value.videoUrl,
     playbackId: locked ? '' : value.playbackId,
     userProgress: progress || null,
-    ...(locked ? { message: 'Premium subscription required' } : {}),
+    ...(locked
+      ? {
+          lockMessage: VIDEO_LOCK_MESSAGE,
+          message: VIDEO_LOCK_MESSAGE,
+        }
+      : {}),
   };
 };
 
@@ -66,6 +73,12 @@ const listPublishedPdfs = async (query) =>
 
 const toPublicPdfList = (pdfs, user, course, video = null) =>
   pdfs.map((pdf) => toPublicPdf(pdf, { locked: isPdfLocked(pdf, user, course, video) }));
+
+const toLockedPublicVideo = (video, user, progress = null) =>
+  toPublicVideo(video, {
+    locked: isVideoLocked(video, user),
+    progress,
+  });
 
 const getPublishedChapterIds = async (courseId) => {
   const chapters = await Chapter.find({ courseId, published: true }).select('_id');
@@ -213,11 +226,39 @@ const getCourse = async (req, res) => {
     }
 
     const chapters = await Chapter.find({ courseId, published: true }).sort({ order: 1 });
-    const [stats, chapterSummaries, coursePdfs] = await Promise.all([
+    const chapterIds = chapters.map((chapter) => chapter._id);
+    const [stats, chapterSummaries, coursePdfs, videos, progressRows] = await Promise.all([
       getCourseLearningStats(req.user._id, courseId),
       getChapterSummaries(req.user._id, chapters),
       listPublishedPdfs({ courseId, scope: 'course' }),
+      Video.find({
+        courseId,
+        chapterId: { $in: chapterIds },
+        published: true,
+      }).sort({ order: 1, createdAt: 1 }),
+      VideoProgress.find({
+        userId: req.user._id,
+        courseId,
+      }),
     ]);
+    const progressByVideo = new Map(
+      progressRows.map((row) => [String(row.videoId), row])
+    );
+    const videosByChapter = new Map();
+    videos.forEach((video) => {
+      const key = String(video.chapterId);
+      const list = videosByChapter.get(key) || [];
+      list.push(
+        toLockedPublicVideo(video, req.user, toUserProgress(progressByVideo.get(String(video._id))))
+      );
+      videosByChapter.set(key, list);
+    });
+    const chaptersWithVideos = chapterSummaries.map((chapter) => ({
+      ...chapter,
+      videos: (videosByChapter.get(String(chapter._id)) || []).sort(
+        (left, right) => (left.order || 0) - (right.order || 0)
+      ),
+    }));
 
     res.json({
       success: true,
@@ -227,7 +268,8 @@ const getCourse = async (req, res) => {
         totalChapters: stats.totalChapters,
         totalVideos: stats.totalVideos,
       }),
-      chapters: chapterSummaries,
+      chapters: chaptersWithVideos,
+      videos: chaptersWithVideos.flatMap((chapter) => chapter.videos),
       pdfs: toPublicPdfList(coursePdfs, req.user, course),
     });
   } catch (error) {
@@ -349,14 +391,10 @@ const getChapter = async (req, res) => {
       },
       pdfs: toPublicPdfList(chapterPdfs, req.user, course),
       videos: videos.map((video) => {
-        const locked = isVideoLocked(video, req.user, course);
         const row = progressByVideo.get(String(video._id));
         const videoPdfs = pdfsByVideo.get(String(video._id)) || [];
         return {
-          ...toPublicVideo(video, {
-            locked,
-            progress: toUserProgress(row),
-          }),
+          ...toLockedPublicVideo(video, req.user, toUserProgress(row)),
           pdfs: toPublicPdfList(videoPdfs, req.user, course, video),
         };
       }),
@@ -405,14 +443,14 @@ const getVideo = async (req, res) => {
       });
     }
 
-    const locked = isVideoLocked(video, req.user, course);
+    const locked = isVideoLocked(video, req.user);
 
     const lecturePdfs = await listPublishedPdfs({ videoId, scope: 'lecture' });
 
     if (locked) {
       return res.status(403).json({
         success: false,
-        message: 'Premium subscription required',
+        message: VIDEO_LOCK_MESSAGE,
         video: {
           ...toPublicVideo(video, { locked: true }),
           pdfs: toPublicPdfList(lecturePdfs, req.user, course, video),
@@ -440,11 +478,137 @@ const getVideo = async (req, res) => {
   }
 };
 
+const listCourseVideos = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+
+    if (!isValidId(courseId)) {
+      return invalidIdResponse(res, 'course ID');
+    }
+
+    const course = await Course.findOne({ _id: courseId, ...PUBLISHED_COURSE });
+
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: 'Course not found',
+      });
+    }
+
+    const chapters = await Chapter.find({ courseId, published: true }).sort({ order: 1 });
+    const chapterIds = chapters.map((chapter) => chapter._id);
+    const videos = await Video.find({
+      courseId,
+      chapterId: { $in: chapterIds },
+      published: true,
+    }).sort({ order: 1, createdAt: 1 });
+    const progressRows = await VideoProgress.find({
+      userId: req.user._id,
+      videoId: { $in: videos.map((video) => video._id) },
+    });
+    const progressByVideo = new Map(
+      progressRows.map((row) => [String(row.videoId), row])
+    );
+    const chapterOrder = new Map(chapters.map((chapter, index) => [String(chapter._id), index]));
+
+    const orderedVideos = [...videos].sort((left, right) => {
+      const chapterDiff =
+        (chapterOrder.get(String(left.chapterId)) || 0) -
+        (chapterOrder.get(String(right.chapterId)) || 0);
+
+      if (chapterDiff !== 0) {
+        return chapterDiff;
+      }
+
+      return (left.order || 0) - (right.order || 0);
+    });
+
+    res.json({
+      success: true,
+      message: 'Videos fetched successfully',
+      videos: orderedVideos.map((video) =>
+        toLockedPublicVideo(
+          video,
+          req.user,
+          toUserProgress(progressByVideo.get(String(video._id)))
+        )
+      ),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching videos',
+      error: error.message,
+    });
+  }
+};
+
+const downloadVideo = async (req, res) => {
+  try {
+    const { videoId } = req.params;
+
+    if (!isValidId(videoId)) {
+      return invalidIdResponse(res, 'video ID');
+    }
+
+    const video = await Video.findById(videoId);
+
+    if (!video || !video.published) {
+      return res.status(404).json({
+        success: false,
+        message: 'Video not found',
+      });
+    }
+
+    const [course, chapter] = await Promise.all([
+      Course.findById(video.courseId),
+      Chapter.findById(video.chapterId),
+    ]);
+
+    if (
+      !course ||
+      course.status !== 'Published' ||
+      !chapter ||
+      !chapter.published
+    ) {
+      return res.status(404).json({
+        success: false,
+        message: 'Video not found',
+      });
+    }
+
+    const locked = isVideoLocked(video, req.user);
+
+    if (locked) {
+      return res.status(403).json({
+        success: false,
+        message: VIDEO_LOCK_MESSAGE,
+        video: toPublicVideo(video, { locked: true }),
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Video download ready',
+      videoUrl: video.videoUrl,
+      video: toPublicVideo(video, { locked: false }),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error while downloading video',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   listCourses,
   getCourse,
   listChapters,
   getChapter,
   getVideo,
+  listCourseVideos,
+  downloadVideo,
   toPublicVideo,
 };

@@ -1,11 +1,48 @@
 const User = require('../../models/User');
 const Course = require('../../models/Course');
+const Video = require('../../models/Video');
 const VideoProgress = require('../../models/VideoProgress');
 const { isValidId, invalidIdResponse } = require('../../utils/ids');
 const { toPublicUser } = require('../../utils/userResponse');
 const { asBoolean } = require('../../utils/courseValidation');
 const { getPagination, paginationMeta } = require('../../utils/pagination');
 const { deleteProfilePhotos } = require('../../services/photoStorage.service');
+
+const toUnlockedCourses = (courses) =>
+  (courses || [])
+    .filter(Boolean)
+    .map((course) =>
+      course && course.title
+        ? {
+            _id: course._id,
+            title: course.title,
+            status: course.status,
+          }
+        : { _id: course._id || course }
+    );
+
+const toUnlockedVideos = (videos) =>
+  (videos || [])
+    .filter(Boolean)
+    .map((video) =>
+      video && video.title
+        ? {
+            _id: video._id,
+            title: video.title,
+          }
+        : { _id: video._id || video }
+    );
+
+const populateUserAccess = (query) =>
+  query
+    .populate('unlockedCourses', 'title status')
+    .populate('unlockedVideos', 'title');
+
+const toAccessUser = (user) => ({
+  ...toPublicUser(user),
+  unlockedCourses: toUnlockedCourses(user.unlockedCourses),
+  unlockedVideos: toUnlockedVideos(user.unlockedVideos),
+});
 
 const getUserOr404 = async (res, userId) => {
   if (!isValidId(userId)) {
@@ -41,9 +78,8 @@ const toListUser = (user) => {
     joinedDate: value.joinedDate,
     lastLoginAt: value.lastLoginAt,
     lastDevice: value.lastDevice,
-    unlockedCourses: (value.unlockedCourses || []).map((item) =>
-      item && item._id ? String(item._id) : String(item)
-    ),
+    unlockedCourses: value.unlockedCourses || [],
+    unlockedVideos: value.unlockedVideos || [],
     createdAt: value.createdAt,
     updatedAt: value.updatedAt,
   };
@@ -99,10 +135,7 @@ const getUser = async (req, res) => {
       return invalidIdResponse(res, 'user ID');
     }
 
-    const user = await User.findById(req.params.userId).populate(
-      'unlockedCourses',
-      'title status'
-    );
+    const user = await populateUserAccess(User.findById(req.params.userId));
 
     if (!user) {
       return res.status(404).json({
@@ -114,14 +147,7 @@ const getUser = async (req, res) => {
     res.json({
       success: true,
       message: 'User fetched successfully',
-      user: {
-        ...toPublicUser(user),
-        unlockedCourses: (user.unlockedCourses || []).map((course) => ({
-          _id: course._id,
-          title: course.title,
-          status: course.status,
-        })),
-      },
+      user: toAccessUser(user),
     });
   } catch (error) {
     res.status(500).json({
@@ -261,24 +287,90 @@ const updateCourseAccess = async (req, res) => {
     }
 
     await user.save();
-    await user.populate('unlockedCourses', 'title status');
+    await populateUserAccess(user);
 
     res.json({
       success: true,
       message: 'Course access updated successfully',
-      user: {
-        ...toPublicUser(user),
-        unlockedCourses: (user.unlockedCourses || []).map((item) => ({
-          _id: item._id,
-          title: item.title,
-          status: item.status,
-        })),
-      },
+      user: toAccessUser(user),
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Server error while updating course access',
+      error: error.message,
+    });
+  }
+};
+
+const updateVideoAccess = async (req, res) => {
+  try {
+    const { videoId, unlocked } = req.body;
+
+    if (!videoId || unlocked === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide videoId and unlocked',
+      });
+    }
+
+    if (!isValidId(videoId)) {
+      return invalidIdResponse(res, 'video ID');
+    }
+
+    const user = await getUserOr404(res, req.params.userId);
+
+    if (!user) {
+      return;
+    }
+
+    if (user.role === 'admin') {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot update video access for an admin account',
+      });
+    }
+
+    const video = await Video.findById(videoId).select('title');
+
+    if (!video) {
+      return res.status(404).json({
+        success: false,
+        message: 'Video not found',
+      });
+    }
+
+    const shouldUnlock = asBoolean(unlocked, false);
+    const currentIds = (user.unlockedVideos || []).map((id) => String(id));
+
+    if (shouldUnlock) {
+      if (!currentIds.includes(String(videoId))) {
+        user.unlockedVideos.push(video._id);
+      }
+    } else {
+      user.unlockedVideos = user.unlockedVideos.filter(
+        (id) => String(id) !== String(videoId)
+      );
+    }
+
+    await user.save();
+    await populateUserAccess(user);
+
+    res.json({
+      success: true,
+      message: 'Video access updated successfully',
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        unlockedCourses: toUnlockedCourses(user.unlockedCourses),
+        unlockedVideos: toUnlockedVideos(user.unlockedVideos),
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error while updating video access',
       error: error.message,
     });
   }
@@ -290,4 +382,5 @@ module.exports = {
   blockUser,
   deleteUser,
   updateCourseAccess,
+  updateVideoAccess,
 };

@@ -4,7 +4,7 @@ const Video = require('../../models/Video');
 const VideoProgress = require('../../models/VideoProgress');
 const { isValidId, invalidIdResponse } = require('../../utils/ids');
 const { toNumber } = require('../../utils/duration');
-const { isVideoLocked } = require('../../utils/subscription');
+const { isVideoLocked, VIDEO_LOCK_MESSAGE } = require('../../utils/subscription');
 const { getPagination, paginationMeta } = require('../../utils/pagination');
 const { resolveCompleted, toUserProgress, emptyProgress } = require('../../utils/learningProgress');
 const { toPublicVideo } = require('./courseController');
@@ -40,12 +40,12 @@ const saveProgress = async (req, res) => {
       });
     }
 
-    const locked = isVideoLocked(video, req.user, course);
+    const locked = isVideoLocked(video, req.user);
 
     if (locked) {
       return res.status(403).json({
         success: false,
-        message: 'Premium subscription required',
+        message: VIDEO_LOCK_MESSAGE,
       });
     }
 
@@ -149,7 +149,7 @@ const mapWatchItems = async (user, rows) => {
         return null;
       }
 
-      const locked = isVideoLocked(video, user, course);
+      const locked = isVideoLocked(video, user);
 
       return {
         course: {

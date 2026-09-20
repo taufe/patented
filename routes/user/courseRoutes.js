@@ -6,6 +6,8 @@ const {
   listChapters,
   getChapter,
   getVideo,
+  listCourseVideos,
+  downloadVideo,
 } = require('../../controllers/user/courseController');
 const {
   saveProgress,
@@ -31,6 +33,7 @@ router.use(protect);
 
 router.get('/courses', listCourses);
 router.get('/courses/:courseId', getCourse);
+router.get('/courses/:courseId/videos', listCourseVideos);
 router.get('/courses/:courseId/pdfs', listCoursePdfs);
 router.get('/courses/:courseId/pdfs/:pdfId/download', downloadCoursePdf);
 router.get('/courses/:courseId/pdfs/:pdfId', getCoursePdf);
@@ -43,6 +46,7 @@ router.get('/courses/:courseId/chapters/:chapterId', getChapter);
 router.get('/videos/:videoId/pdfs', listVideoPdfs);
 router.get('/videos/:videoId/pdfs/:pdfId/download', downloadVideoPdf);
 router.get('/videos/:videoId/pdfs/:pdfId', getVideoPdf);
+router.get('/videos/:videoId/download', downloadVideo);
 router.get('/videos/:videoId', getVideo);
 router.get('/videos/:videoId/progress', getProgress);
 router.post('/videos/:videoId/progress', saveProgress);
