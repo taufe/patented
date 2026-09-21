@@ -32,12 +32,12 @@ const resolveRecipients = async (audience, userIds = []) => {
       return [];
     }
 
-    return User.find({ _id: { $in: ids }, role: 'user', isBlocked: false }).select(
+    return User.find({ _id: { $in: ids }, role: 'user' }).select(
       '_id pushNotification isPremium premiumExpiresAt role'
     );
   }
 
-  const users = await User.find({ role: 'user', isBlocked: false }).select(
+  const users = await User.find({ role: 'user' }).select(
     '_id pushNotification isPremium premiumExpiresAt role'
   );
 

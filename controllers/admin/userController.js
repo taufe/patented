@@ -243,25 +243,44 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const toAccessIdList = (items) =>
+  (items || [])
+    .filter(Boolean)
+    .map((item) => (item && item._id ? String(item._id) : String(item)));
+
 const updateCourseAccess = async (req, res) => {
   try {
+    const { userId } = req.params;
     const { courseId, unlocked } = req.body;
 
-    if (!courseId || unlocked === undefined) {
+    if (!courseId || typeof unlocked !== 'boolean') {
       return res.status(400).json({
         success: false,
         message: 'Please provide courseId and unlocked',
       });
     }
 
-    if (!isValidId(courseId)) {
-      return invalidIdResponse(res, 'course ID');
+    if (!isValidId(userId) || !isValidId(courseId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user or course id',
+      });
     }
 
-    const user = await getUserOr404(res, req.params.userId);
+    const user = await User.findById(userId);
 
     if (!user) {
-      return;
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    if (user.role === 'admin') {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot update course access for an admin account',
+      });
     }
 
     const course = await Course.findById(courseId).select('title status');
@@ -273,28 +292,44 @@ const updateCourseAccess = async (req, res) => {
       });
     }
 
-    const shouldUnlock = asBoolean(unlocked, false);
-    const currentIds = (user.unlockedCourses || []).map((id) => String(id));
+    const update = unlocked
+      ? { $addToSet: { unlockedCourses: course._id } }
+      : { $pull: { unlockedCourses: course._id } };
 
-    if (shouldUnlock) {
-      if (!currentIds.includes(String(courseId))) {
-        user.unlockedCourses.push(course._id);
-      }
-    } else {
-      user.unlockedCourses = user.unlockedCourses.filter(
-        (id) => String(id) !== String(courseId)
-      );
+    await User.updateOne({ _id: user._id }, update);
+
+    let updated = await User.findById(user._id).select(
+      'name email unlockedCourses unlockedVideos'
+    );
+    let unlockedCourses;
+    let unlockedVideos;
+
+    try {
+      updated = await updated.populate([
+        { path: 'unlockedCourses', select: 'title status' },
+        { path: 'unlockedVideos', select: 'title' },
+      ]);
+      unlockedCourses = toUnlockedCourses(updated.unlockedCourses);
+      unlockedVideos = toUnlockedVideos(updated.unlockedVideos);
+    } catch (populateError) {
+      console.error(populateError);
+      unlockedCourses = toAccessIdList(updated.unlockedCourses);
+      unlockedVideos = toAccessIdList(updated.unlockedVideos);
     }
-
-    await user.save();
-    await populateUserAccess(user);
 
     res.json({
       success: true,
       message: 'Course access updated successfully',
-      user: toAccessUser(user),
+      user: {
+        _id: updated._id,
+        name: updated.name,
+        email: updated.email,
+        unlockedCourses,
+        unlockedVideos,
+      },
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error while updating course access',

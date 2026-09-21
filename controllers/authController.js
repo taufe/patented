@@ -120,13 +120,6 @@ const login = async (req, res) => {
       });
     }
 
-    if (user.isBlocked) {
-      return res.status(403).json({
-        success: false,
-        message: 'Your account has been blocked. Contact support.',
-      });
-    }
-
     user.lastLoginAt = new Date();
     user.lastDevice = (req.body.device || req.headers['x-device'] || user.lastDevice || '')
       .toString()
