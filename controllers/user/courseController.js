@@ -3,10 +3,17 @@ const Chapter = require('../../models/Chapter');
 const Video = require('../../models/Video');
 const VideoProgress = require('../../models/VideoProgress');
 const Pdf = require('../../models/Pdf');
+const Book = require('../../models/Book');
+const Quiz = require('../../models/Quiz');
 const { isValidId, invalidIdResponse } = require('../../utils/ids');
 const { formatDurationLabel } = require('../../utils/duration');
 const { getPagination, paginationMeta } = require('../../utils/pagination');
-const { isVideoLocked, isPdfLocked, VIDEO_LOCK_MESSAGE } = require('../../utils/subscription');
+const {
+  isVideoLocked,
+  isPdfLocked,
+  VIDEO_LOCK_MESSAGE,
+  hasCourseAccess,
+} = require('../../utils/subscription');
 const { toUserProgress } = require('../../utils/learningProgress');
 const { toPublicPdf } = require('../../utils/pdfResponse');
 
@@ -227,20 +234,28 @@ const getCourse = async (req, res) => {
 
     const chapters = await Chapter.find({ courseId, published: true }).sort({ order: 1 });
     const chapterIds = chapters.map((chapter) => chapter._id);
-    const [stats, chapterSummaries, coursePdfs, videos, progressRows] = await Promise.all([
-      getCourseLearningStats(req.user._id, courseId),
-      getChapterSummaries(req.user._id, chapters),
-      listPublishedPdfs({ courseId, scope: 'course' }),
-      Video.find({
-        courseId,
-        chapterId: { $in: chapterIds },
-        published: true,
-      }).sort({ order: 1, createdAt: 1 }),
-      VideoProgress.find({
-        userId: req.user._id,
-        courseId,
-      }),
-    ]);
+    const booksLocked = !hasCourseAccess(req.user, course._id);
+    const quizLocked = booksLocked;
+    const [stats, chapterSummaries, coursePdfs, videos, progressRows, quiz, publishedBooksCount] =
+      await Promise.all([
+        getCourseLearningStats(req.user._id, courseId),
+        getChapterSummaries(req.user._id, chapters),
+        listPublishedPdfs({ courseId, scope: 'course' }),
+        Video.find({
+          courseId,
+          chapterId: { $in: chapterIds },
+          published: true,
+        }).sort({ order: 1, createdAt: 1 }),
+        VideoProgress.find({
+          userId: req.user._id,
+          courseId,
+        }),
+        Quiz.findOne({ courseId: course._id }),
+        booksLocked ? Promise.resolve(0) : Book.countDocuments({ courseId: course._id, published: true }),
+      ]);
+    const quizAvailable = Boolean(
+      course.quizAvailable && quiz && quiz.isPublished && quiz.isEnabled
+    );
     const progressByVideo = new Map(
       progressRows.map((row) => [String(row.videoId), row])
     );
@@ -267,10 +282,18 @@ const getCourse = async (req, res) => {
         progress: stats.progress,
         totalChapters: stats.totalChapters,
         totalVideos: stats.totalVideos,
+        quizAvailable,
+        booksLocked,
+        quizLocked,
+        publishedBooksCount,
       }),
       chapters: chaptersWithVideos,
       videos: chaptersWithVideos.flatMap((chapter) => chapter.videos),
       pdfs: toPublicPdfList(coursePdfs, req.user, course),
+      booksLocked,
+      quizLocked,
+      quizAvailable,
+      publishedBooksCount,
     });
   } catch (error) {
     res.status(500).json({

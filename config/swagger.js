@@ -95,6 +95,7 @@ const swaggerOptions = {
     path.join(__dirname, '../docs/swagger/paths.js'),
     path.join(__dirname, '../docs/swagger/coursePaths.js'),
     path.join(__dirname, '../docs/swagger/pdfPaths.js'),
+    path.join(__dirname, '../docs/swagger/bookQuizPaths.js'),
     path.join(__dirname, '../docs/swagger/accountPaths.js'),
     path.join(__dirname, '../docs/swagger/paymentNotificationPaths.js'),
     path.join(__dirname, '../docs/swagger/contactPaths.js'),

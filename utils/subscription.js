@@ -103,12 +103,39 @@ const isPdfLocked = (pdf, user, course, video = null) => {
   return isCourseContentLocked(user, course);
 };
 
+const COURSE_LOCKED_CODE = 'COURSE_LOCKED';
+const COURSE_LOCKED_MESSAGE =
+  'This content is locked. Contact admin to unlock the video course.';
+
+const hasCourseAccess = (user, courseId) => {
+  if (!user) {
+    return false;
+  }
+
+  if (user.role === 'admin') {
+    return true;
+  }
+
+  return hasUnlockedCourse(user, courseId);
+};
+
+const sendCourseLocked = (res) =>
+  res.status(403).json({
+    success: false,
+    code: COURSE_LOCKED_CODE,
+    message: COURSE_LOCKED_MESSAGE,
+  });
+
 module.exports = {
   VIDEO_LOCK_MESSAGE,
+  COURSE_LOCKED_CODE,
+  COURSE_LOCKED_MESSAGE,
   hasActivePremium,
   userHasActiveSubscription,
   hasUnlockedCourse,
   hasUnlockedVideo,
+  hasCourseAccess,
+  sendCourseLocked,
   isVideoLocked,
   isCourseContentLocked,
   isPdfLocked,

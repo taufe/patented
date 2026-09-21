@@ -2,7 +2,12 @@ const Course = require('../../models/Course');
 const Chapter = require('../../models/Chapter');
 const Video = require('../../models/Video');
 const VideoProgress = require('../../models/VideoProgress');
+const Book = require('../../models/Book');
+const Quiz = require('../../models/Quiz');
+const Question = require('../../models/Question');
+const QuizAttempt = require('../../models/QuizAttempt');
 const { deletePdfsAndFiles } = require('../../services/pdfCleanup.service');
+const { deleteStoredPdf } = require('../../services/pdfStorage.service');
 const { isValidId, invalidIdResponse } = require('../../utils/ids');
 const { toNumber } = require('../../utils/duration');
 const { getPagination, paginationMeta } = require('../../utils/pagination');
@@ -222,11 +227,23 @@ const deleteCourse = async (req, res) => {
 
     const videos = await Video.find({ courseId }).select('_id');
     const videoIds = videos.map((video) => video._id);
+    const books = await Book.find({ courseId }).select('storageKey pdfUrl');
+    const quiz = await Quiz.findOne({ courseId }).select('_id');
+
+    await Promise.all(
+      books.map((book) => deleteStoredPdf(book.storageKey || book.pdfUrl).catch((error) => {
+        console.error(`Failed to delete book PDF ${book._id}: ${error.message}`);
+      }))
+    );
 
     await Promise.all([
       VideoProgress.deleteMany({ $or: [{ courseId }, { videoId: { $in: videoIds } }] }),
       Video.deleteMany({ courseId }),
       Chapter.deleteMany({ courseId }),
+      Book.deleteMany({ courseId }),
+      quiz ? Question.deleteMany({ quizId: quiz._id }) : Promise.resolve(),
+      QuizAttempt.deleteMany({ courseId }),
+      quiz ? Quiz.deleteOne({ _id: quiz._id }) : Promise.resolve(),
       deletePdfsAndFiles({ courseId }),
       Course.deleteOne({ _id: courseId }),
     ]);

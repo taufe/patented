@@ -8,11 +8,13 @@ const {
   updateCourseAccess,
   updateVideoAccess,
 } = require('../../controllers/admin/userController');
+const { listUserAttempts } = require('../../controllers/admin/quizController');
 
 const router = express.Router();
 
 router.use(protect, adminOnly);
 router.get('/users', listUsers);
+router.get('/users/:userId/quiz-attempts', listUserAttempts);
 router.get('/users/:userId', getUser);
 router.patch('/users/:userId/block', blockUser);
 router.patch('/users/:userId/course-access', updateCourseAccess);

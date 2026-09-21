@@ -2,6 +2,7 @@ const User = require('../../models/User');
 const Course = require('../../models/Course');
 const Video = require('../../models/Video');
 const VideoProgress = require('../../models/VideoProgress');
+const QuizAttempt = require('../../models/QuizAttempt');
 const { isValidId, invalidIdResponse } = require('../../utils/ids');
 const { toPublicUser } = require('../../utils/userResponse');
 const { asBoolean } = require('../../utils/courseValidation');
@@ -144,10 +145,28 @@ const getUser = async (req, res) => {
       });
     }
 
+    const [quizAttemptsCount, latestAttempts] = await Promise.all([
+      QuizAttempt.countDocuments({ userId: user._id }),
+      QuizAttempt.find({ userId: user._id })
+        .sort({ submittedAt: -1 })
+        .limit(5)
+        .populate('courseId', 'title'),
+    ]);
+
     res.json({
       success: true,
       message: 'User fetched successfully',
-      user: toAccessUser(user),
+      user: {
+        ...toAccessUser(user),
+        quizAttemptsCount,
+        latestQuizAttempts: latestAttempts.map((attempt) => ({
+          courseId: attempt.courseId && attempt.courseId._id ? attempt.courseId._id : attempt.courseId,
+          courseTitle: attempt.courseId && attempt.courseId.title ? attempt.courseId.title : '',
+          percentage: attempt.percentage,
+          passed: Boolean(attempt.passed),
+          submittedAt: attempt.submittedAt,
+        })),
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -227,6 +246,7 @@ const deleteUser = async (req, res) => {
     }
 
     await VideoProgress.deleteMany({ userId: user._id });
+    await QuizAttempt.deleteMany({ userId: user._id });
     await deleteProfilePhotos(user._id);
     await User.deleteOne({ _id: user._id });
 

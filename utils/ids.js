@@ -21,6 +21,7 @@ const isValidId = (id) => {
 const invalidIdResponse = (res, label = 'ID') =>
   res.status(400).json({
     success: false,
+    code: 'VALIDATION',
     message: `Invalid ${label}`,
   });
 

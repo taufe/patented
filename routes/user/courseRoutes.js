@@ -26,6 +26,16 @@ const {
   getVideoPdf,
   downloadVideoPdf,
 } = require('../../controllers/user/pdfController');
+const {
+  listBooks,
+  getBook,
+  downloadBook,
+} = require('../../controllers/user/bookController');
+const {
+  getQuiz,
+  submitQuiz,
+  listAttempts,
+} = require('../../controllers/user/quizController');
 
 const router = express.Router();
 
@@ -34,6 +44,12 @@ router.use(protect);
 router.get('/courses', listCourses);
 router.get('/courses/:courseId', getCourse);
 router.get('/courses/:courseId/videos', listCourseVideos);
+router.get('/courses/:courseId/books/:bookId/download', downloadBook);
+router.get('/courses/:courseId/books/:bookId', getBook);
+router.get('/courses/:courseId/books', listBooks);
+router.get('/courses/:courseId/quiz/attempts', listAttempts);
+router.post('/courses/:courseId/quiz/submit', submitQuiz);
+router.get('/courses/:courseId/quiz', getQuiz);
 router.get('/courses/:courseId/pdfs', listCoursePdfs);
 router.get('/courses/:courseId/pdfs/:pdfId/download', downloadCoursePdf);
 router.get('/courses/:courseId/pdfs/:pdfId', getCoursePdf);
