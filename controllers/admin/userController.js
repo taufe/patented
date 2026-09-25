@@ -2,6 +2,7 @@ const User = require('../../models/User');
 const Course = require('../../models/Course');
 const Video = require('../../models/Video');
 const VideoProgress = require('../../models/VideoProgress');
+const VideoAccessLog = require('../../models/VideoAccessLog');
 const QuizAttempt = require('../../models/QuizAttempt');
 const { isValidId, invalidIdResponse } = require('../../utils/ids');
 const { toPublicUser } = require('../../utils/userResponse');
@@ -37,12 +38,14 @@ const toUnlockedVideos = (videos) =>
 const populateUserAccess = (query) =>
   query
     .populate('unlockedCourses', 'title status')
-    .populate('unlockedVideos', 'title');
+    .populate('unlockedVideos', 'title')
+    .populate('lockedVideos', 'title');
 
 const toAccessUser = (user) => ({
   ...toPublicUser(user),
   unlockedCourses: toUnlockedCourses(user.unlockedCourses),
   unlockedVideos: toUnlockedVideos(user.unlockedVideos),
+  lockedVideos: toUnlockedVideos(user.lockedVideos),
 });
 
 const getUserOr404 = async (res, userId) => {
@@ -81,6 +84,7 @@ const toListUser = (user) => {
     lastDevice: value.lastDevice,
     unlockedCourses: value.unlockedCourses || [],
     unlockedVideos: value.unlockedVideos || [],
+    lockedVideos: value.lockedVideos || [],
     createdAt: value.createdAt,
     updatedAt: value.updatedAt,
   };
@@ -358,14 +362,35 @@ const updateCourseAccess = async (req, res) => {
   }
 };
 
+const toVideoIdSet = (items) => {
+  const ids = new Set();
+
+  for (const item of items || []) {
+    const value = item && item._id ? String(item._id) : String(item || '');
+
+    if (isValidId(value)) {
+      ids.add(value);
+    }
+  }
+
+  return ids;
+};
+
 const updateVideoAccess = async (req, res) => {
   try {
-    const { videoId, unlocked } = req.body;
+    const { userId: bodyUserId, videoId, unlocked, log } = req.body;
 
     if (!videoId || unlocked === undefined) {
       return res.status(400).json({
         success: false,
         message: 'Please provide videoId and unlocked',
+      });
+    }
+
+    if (bodyUserId && String(bodyUserId) !== String(req.params.userId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'userId does not match the user being updated',
       });
     }
 
@@ -396,19 +421,63 @@ const updateVideoAccess = async (req, res) => {
     }
 
     const shouldUnlock = asBoolean(unlocked, false);
-    const currentIds = (user.unlockedVideos || []).map((id) => String(id));
+    const previousUnlocked = toVideoIdSet(user.unlockedVideos);
+    const previousLocked = toVideoIdSet(user.lockedVideos);
+    const nextUnlocked = Array.isArray(req.body.unlockedVideos)
+      ? toVideoIdSet(req.body.unlockedVideos)
+      : new Set(previousUnlocked);
+    const nextLocked = Array.isArray(req.body.lockedVideos)
+      ? toVideoIdSet(req.body.lockedVideos)
+      : new Set(previousLocked);
+    const targetId = String(video._id);
 
     if (shouldUnlock) {
-      if (!currentIds.includes(String(videoId))) {
-        user.unlockedVideos.push(video._id);
-      }
+      nextUnlocked.add(targetId);
+      nextLocked.delete(targetId);
     } else {
-      user.unlockedVideos = user.unlockedVideos.filter(
-        (id) => String(id) !== String(videoId)
-      );
+      nextLocked.add(targetId);
+      nextUnlocked.delete(targetId);
     }
 
+    for (const id of [...nextUnlocked]) {
+      if (id !== targetId && nextLocked.has(id)) {
+        nextUnlocked.delete(id);
+      }
+    }
+
+    user.unlockedVideos = [...nextUnlocked];
+    user.lockedVideos = [...nextLocked];
     await user.save();
+
+    if (log !== false) {
+      const changedIds = new Set([...previousUnlocked, ...previousLocked, ...nextUnlocked, ...nextLocked]);
+      const timestamp = new Date();
+      const entries = [];
+
+      for (const id of changedIds) {
+        const wasUnlocked = previousUnlocked.has(id) && !previousLocked.has(id);
+        const wasLocked = previousLocked.has(id);
+        const isUnlocked = nextUnlocked.has(id) && !nextLocked.has(id);
+        const isLocked = nextLocked.has(id);
+
+        if (wasUnlocked === isUnlocked && wasLocked === isLocked) {
+          continue;
+        }
+
+        entries.push({
+          adminId: req.user._id,
+          userId: user._id,
+          videoId: id,
+          unlocked: id === targetId ? shouldUnlock : isUnlocked && !isLocked,
+          timestamp,
+        });
+      }
+
+      if (entries.length > 0) {
+        await VideoAccessLog.insertMany(entries);
+      }
+    }
+
     await populateUserAccess(user);
 
     res.json({
@@ -420,6 +489,7 @@ const updateVideoAccess = async (req, res) => {
         email: user.email,
         unlockedCourses: toUnlockedCourses(user.unlockedCourses),
         unlockedVideos: toUnlockedVideos(user.unlockedVideos),
+        lockedVideos: toUnlockedVideos(user.lockedVideos),
       },
     });
   } catch (error) {

@@ -270,6 +270,7 @@ const deleteVideo = async (req, res) => {
     await Promise.all([
       VideoProgress.deleteMany({ videoId }),
       User.updateMany({ unlockedVideos: videoId }, { $pull: { unlockedVideos: videoId } }),
+      User.updateMany({ lockedVideos: videoId }, { $pull: { lockedVideos: videoId } }),
       deletePdfsAndFiles({ videoId }),
       Video.deleteOne({ _id: videoId }),
     ]);

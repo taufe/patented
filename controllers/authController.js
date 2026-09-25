@@ -11,6 +11,7 @@ const {
   isValidOtp,
   validatePassword,
 } = require('../utils/validation');
+const { findFirstChapter4VideoId } = require('../utils/chapter4Preview');
 
 const RESET_CODE_EXPIRY_MS = 10 * 60 * 1000;
 const RESET_TOKEN_EXPIRY_MS = 15 * 60 * 1000;
@@ -70,12 +71,15 @@ const register = async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    const firstChapter4VideoId = await findFirstChapter4VideoId();
 
     const user = await User.create({
       name,
       email: normalizedEmail,
       password: hashedPassword,
       role: 'user',
+      unlockedVideos: firstChapter4VideoId ? [firstChapter4VideoId] : [],
+      lockedVideos: [],
     });
 
     res.status(201).json({

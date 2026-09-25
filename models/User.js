@@ -115,6 +115,15 @@ const userSchema = new mongoose.Schema(
       ],
       default: [],
     },
+    lockedVideos: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Video',
+        },
+      ],
+      default: [],
+    },
     emailNotification: {
       type: Boolean,
       default: true,

@@ -47,8 +47,20 @@ const hasUnlockedVideo = (user, videoId) => {
   return user.unlockedVideos.some((item) => toRefId(item) === String(videoId));
 };
 
+const hasLockedVideo = (user, videoId) => {
+  if (!user || !videoId || !Array.isArray(user.lockedVideos)) {
+    return false;
+  }
+
+  return user.lockedVideos.some((item) => toRefId(item) === String(videoId));
+};
+
 const isVideoLocked = (video, user) => {
   if (!video) {
+    return true;
+  }
+
+  if (user && user.role !== 'admin' && hasLockedVideo(user, video._id)) {
     return true;
   }
 
@@ -134,6 +146,7 @@ module.exports = {
   userHasActiveSubscription,
   hasUnlockedCourse,
   hasUnlockedVideo,
+  hasLockedVideo,
   hasCourseAccess,
   sendCourseLocked,
   isVideoLocked,

@@ -33,6 +33,7 @@ const toPublicUser = (user) => {
   userResponse.hobbies = userResponse.hobbies || [];
   userResponse.unlockedCourses = toIdList(userResponse.unlockedCourses);
   userResponse.unlockedVideos = toIdList(userResponse.unlockedVideos);
+  userResponse.lockedVideos = toIdList(userResponse.lockedVideos);
   userResponse.emailNotification = userResponse.emailNotification !== false;
   userResponse.pushNotification = userResponse.pushNotification !== false;
   userResponse.marketingEmails = Boolean(userResponse.marketingEmails);

@@ -38,6 +38,11 @@
  *           items:
  *             type: string
  *           example: [665f1a2b3c4d5e6f7a8b9c11]
+ *         lockedVideos:
+ *           type: array
+ *           items:
+ *             type: string
+ *           example: []
  *         createdAt:
  *           type: string
  *           format: date-time

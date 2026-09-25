@@ -219,8 +219,16 @@
  *             type: object
  *             required: [videoId, unlocked]
  *             properties:
+ *               userId: { type: string }
  *               videoId: { type: string }
  *               unlocked: { type: boolean }
+ *               unlockedVideos:
+ *                 type: array
+ *                 items: { type: string }
+ *               lockedVideos:
+ *                 type: array
+ *                 items: { type: string }
+ *               log: { type: boolean }
  *     responses:
  *       200:
  *         description: Video access updated

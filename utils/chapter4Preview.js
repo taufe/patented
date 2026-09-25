@@ -49,6 +49,30 @@ const applyChapter4Preview = async (chapter) => {
   return { updated, total: videos.length };
 };
 
+const findFirstChapter4VideoId = async () => {
+  const chapters = await Chapter.find({
+    $or: [{ title: { $regex: CHAPTER_4_TITLE } }, { order: 4 }],
+  })
+    .sort({ order: 1, createdAt: 1 })
+    .select('title order');
+
+  for (const chapter of chapters) {
+    if (!isChapter4(chapter)) {
+      continue;
+    }
+
+    const video = await Video.findOne({ chapterId: chapter._id })
+      .sort({ order: 1, createdAt: 1 })
+      .select('_id');
+
+    if (video) {
+      return video._id;
+    }
+  }
+
+  return null;
+};
+
 const applyAllChapter4Previews = async () => {
   const chapters = await Chapter.find({
     $or: [{ title: { $regex: CHAPTER_4_TITLE } }, { order: 4 }],
@@ -75,6 +99,7 @@ const applyAllChapter4Previews = async () => {
 module.exports = {
   CHAPTER_4_TITLE,
   isChapter4,
+  findFirstChapter4VideoId,
   applyChapter4Preview,
   applyAllChapter4Previews,
 };
